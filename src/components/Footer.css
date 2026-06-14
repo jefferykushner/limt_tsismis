@@ -1,0 +1,111 @@
+.footer {
+  background: var(--ink);
+  padding: clamp(48px, 6vw, 80px) var(--gutter) 32px;
+}
+
+.footer__inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+
+.footer__top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 32px;
+}
+
+.footer__brand-name {
+  font-family: var(--font-editorial);
+  font-size: 24px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.footer__brand-sub {
+  font-family: var(--font-display);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blush);
+  margin-bottom: 20px;
+}
+
+.footer__brand-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.65;
+  max-width: 260px;
+}
+
+.footer__sig {
+  font-family: var(--font-editorial);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--blush);
+  margin-top: 20px;
+}
+
+.footer__col-title {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;
+}
+
+.footer__col-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer__col-links a {
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color var(--ease);
+}
+
+.footer__col-links a:hover { color: var(--white); }
+
+.footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer__legal {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.04em;
+}
+
+.footer__social {
+  display: flex;
+  gap: 20px;
+}
+
+.footer__social a {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color var(--ease);
+}
+
+.footer__social a:hover { color: var(--blush); }
+
+@media (max-width: 860px) {
+  .footer__top { grid-template-columns: 1fr; }
+}
