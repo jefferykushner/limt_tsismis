@@ -524,3 +524,33 @@
   .hp-signup__form { flex-direction: column; }
   .hp-signup__input { border-right: 1px solid var(--fog); border-bottom: none; }
 }
+
+/* ═══════════════════════════════════════════════════
+   LG real illustration images
+   ═══════════════════════════════════════════════════ */
+
+/* Hero — LG floats in the dotted field */
+.lg-photo {
+  width: clamp(220px, 28vw, 400px);
+  height: auto;
+}
+.lg-photo__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Story section — LG sits in the blush gradient panel */
+.lg-story-photo {
+  width: clamp(200px, 26vw, 340px);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Tsismis brand panel — LG peeks in above the label */
+.hp-brands__lg {
+  width: clamp(120px, 16vw, 180px);
+  height: auto;
+  margin-bottom: 8px;
+}

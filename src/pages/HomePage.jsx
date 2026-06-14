@@ -1,39 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useRevealAll } from '../hooks/useReveal'
 import './HomePage.css'
-
-/* ── LG SVG placeholders (swap for real illustrations later) ── */
-function LGHero() {
-  return (
-    <div className="lg-circle" aria-hidden="true">
-      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-        <circle cx="40" cy="30" r="18" stroke="#C49B95" strokeWidth="1.5" fill="none"/>
-        <path d="M20 65 C20 50 60 50 60 65" stroke="#C49B95" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <circle cx="33" cy="28" r="2" fill="#C49B95"/>
-        <circle cx="47" cy="28" r="2" fill="#C49B95"/>
-        <path d="M35 36 Q40 40 45 36" stroke="#C49B95" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-        <path d="M28 44 Q26 50 30 52" stroke="#C49B95" strokeWidth="1" fill="none" strokeLinecap="round"/>
-        <path d="M52 44 Q54 50 50 52" stroke="#C49B95" strokeWidth="1" fill="none" strokeLinecap="round"/>
-      </svg>
-    </div>
-  )
-}
-
-function LGStory() {
-  return (
-    <svg width="120" height="140" viewBox="0 0 120 140" fill="none" aria-hidden="true">
-      <circle cx="60" cy="44" r="28" stroke="#C49B95" strokeWidth="1.5" fill="none"/>
-      <circle cx="50" cy="40" r="3" fill="#C49B95"/>
-      <circle cx="70" cy="40" r="3" fill="#C49B95"/>
-      <path d="M52 54 Q60 60 68 54" stroke="#C49B95" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-      <path d="M35 72 L30 120 L90 120 L85 72 Q60 80 35 72Z" stroke="#C49B95" strokeWidth="1" fill="rgba(196,155,149,0.08)" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M42 64 Q36 72 40 78 Q48 74 60 76 Q72 74 80 78 Q84 72 78 64" stroke="#C49B95" strokeWidth="1" fill="none" strokeLinecap="round"/>
-      <circle cx="52" cy="94" r="2" fill="none" stroke="#C49B95" strokeWidth="0.8"/>
-      <circle cx="60" cy="92" r="2" fill="none" stroke="#C49B95" strokeWidth="0.8"/>
-      <circle cx="68" cy="94" r="2" fill="none" stroke="#C49B95" strokeWidth="0.8"/>
-    </svg>
-  )
-}
+import lgLimt from '../assets/lg-limt.png'
+import lgTsismis from '../assets/lg-tsismis.png'
 
 /* ── Bake card data ───────────────────────────────────────── */
 const BAKES = [
@@ -78,7 +47,7 @@ export default function HomePage() {
 
         <div className="hp-hero__visual" aria-hidden="true">
           <div className="hp-hero__lg-wrap">
-            <LGHero />
+            <div className="lg-photo"><img src={lgLimt} alt="" className="lg-photo__img" /></div>
             <p className="hp-hero__lg-caption">
               LG — she's the heart of everything we make.
             </p>
@@ -117,6 +86,7 @@ export default function HomePage() {
         </div>
 
         <div className="hp-brands__panel hp-brands__panel--tsismis reveal">
+          <img src={lgTsismis} alt="" className="hp-brands__lg" />
           <span className="hp-brands__label">The Breakout Child</span>
           <h2 className="hp-brands__name">
             Tsismis<em>.</em>
@@ -137,7 +107,7 @@ export default function HomePage() {
           <div className="hp-story__inner">
 
             <div className="hp-story__visual reveal" aria-hidden="true">
-              <LGStory />
+              <img src={lgLimt} alt="LG, the Love in My Tummy mascot" className="lg-story-photo" />
               <p className="hp-story__lg-label">LG — Little Girl, Little Gossip.</p>
             </div>
 
@@ -218,7 +188,7 @@ export default function HomePage() {
               {
                 n: '2',
                 title: 'Send a Quote Request',
-                desc: 'Fill out a short form with what you would like, your preferred pickup date, and any customizations. We will confirm within 24 hours.',
+                desc: 'Fill out a short form with what you would like, your preferred pickup date, and any customizations. We confirm within 24 hours.',
               },
               {
                 n: '3',
