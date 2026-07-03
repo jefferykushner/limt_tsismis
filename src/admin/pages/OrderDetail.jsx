@@ -104,6 +104,7 @@ const cellInputStyle = { width: '100%', padding: '4px 6px', border: '1px solid v
 
 /* ── Step 2: the real editor, once an order row exists ── */
 function OrderEditor({ orderId }) {
+  const navigate = useNavigate()
   const [order, setOrder] = useState(null)
   const [client, setClient] = useState(null)
   const [lineItems, setLineItems] = useState([])
@@ -281,6 +282,12 @@ function OrderEditor({ orderId }) {
 
   const toggleFlag = (field) => setOrder((o) => ({ ...o, [field]: !o[field] }))
 
+  const handleDeleteOrder = async () => {
+    if (!confirm(`Delete invoice ${order.invoice_number}? It will be kept for 30 days before permanent deletion, in case this was a mistake.`)) return
+    await supabase.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', orderId)
+    navigate('/admin/orders')
+  }
+
   const addNote = async () => {
     const label = newNote.label === 'Custom…' ? newNote.customLabel.trim() : newNote.label
     if (!label || !newNote.content.trim()) return
@@ -423,6 +430,7 @@ function OrderEditor({ orderId }) {
             <option value="cancelled">Cancelled</option>
           </select>
           <button className="dash-btn dash-btn--ghost" onClick={() => window.print()}>Print / Save PDF</button>
+          <button className="dash-btn dash-btn--danger" onClick={handleDeleteOrder}>Delete Invoice</button>
         </div>
       </div>
 
