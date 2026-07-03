@@ -53,13 +53,13 @@
   .invoice-print__tagline {
     font-family: var(--font-editorial);
     font-style: italic;
-    font-size: 0.78rem;
+    font-size: 0.59rem;
     color: #555;
     margin-top: 4px;
   }
   .invoice-print__meta {
     text-align: right;
-    font-size: 0.74rem;
+    font-size: 0.56rem;
   }
   .invoice-print__meta div { margin-bottom: 3px; }
   .invoice-print__meta b { display: inline-block; width: 110px; text-align: left; }
@@ -72,7 +72,7 @@
   }
   .invoice-print__col-title {
     font-family: var(--font-display);
-    font-size: 9px;
+    font-size: 7px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: #777;
@@ -80,14 +80,14 @@
     padding-bottom: 4px;
     margin-bottom: 8px;
   }
-  .invoice-print__cols p { font-size: 0.76rem; margin: 2px 0; }
+  .invoice-print__cols p { font-size: 0.57rem; margin: 2px 0; }
 
   .invoice-print table {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
     margin-bottom: 10px;
-    font-size: 0.74rem;
+    font-size: 0.56rem;
   }
   .invoice-print table col.col-category { width: 11%; }
   .invoice-print table col.col-item { width: 13%; }
@@ -99,7 +99,7 @@
     text-align: left;
     border-bottom: 1.5px solid #201f1c;
     padding: 3px 8px;
-    font-size: 0.6rem;
+    font-size: 0.45rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -124,15 +124,15 @@
     gap: 10px;
   }
   .invoice-print__note {
-    font-size: 0.73rem;
+    font-size: 0.55rem;
     color: #444;
     line-height: 1.4;
   }
 
   .invoice-print__totals {
-    width: 260px;
+    width: 240px;
     flex-shrink: 0;
-    font-size: 0.76rem;
+    font-size: 0.57rem;
   }
   .invoice-print__totals-row {
     display: flex;
@@ -142,7 +142,7 @@
   }
   .invoice-print__totals-row.grand {
     font-weight: 700;
-    font-size: 0.92rem;
+    font-size: 0.69rem;
     border-top: 2px solid #201f1c;
     border-bottom: none;
     margin-top: 6px;
@@ -157,7 +157,7 @@
   }
   .invoice-print__savings-title {
     display: block;
-    font-size: 0.62rem;
+    font-size: 0.47rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #777;
@@ -175,7 +175,7 @@
     text-align: center;
     font-family: var(--font-editorial);
     font-style: italic;
-    font-size: 0.76rem;
+    font-size: 0.57rem;
     color: #777;
   }
 }

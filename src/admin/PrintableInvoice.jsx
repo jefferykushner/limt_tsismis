@@ -35,7 +35,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         <div className="invoice-print__meta">
           <div><b>Invoice #</b>{order.invoice_number}</div>
           <div><b>Order Date</b>{order.order_date}</div>
-          <div><b>Status</b>{order.status}</div>
+          <div><b>Status</b><span className="invoice-print__capitalize">{order.status}</span></div>
         </div>
       </div>
 
