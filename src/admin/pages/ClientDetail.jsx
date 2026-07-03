@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import { money } from '../invoiceMath'
 
 const emptyClient = {
   name: '', phone: '', email: '',
@@ -189,7 +190,7 @@ export default function ClientDetail() {
                   <td>{o.invoice_number}</td>
                   <td>{o.brand_id === 'limt' ? 'LIMT' : 'Tsismis'}</td>
                   <td>{o.event_date || '—'}</td>
-                  <td>${Number(o.amount_due).toFixed(2)}</td>
+                <td>{money(o.amount_due)}</td>
                   <td><span className={`pill pill--${o.status}`}>{o.status}</span></td>
                 </tr>
               ))}

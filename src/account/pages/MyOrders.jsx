@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabaseClient'
+import { money } from '../../admin/invoiceMath'
 
 export default function MyOrders() {
   const { clientRecord } = useAuth()
@@ -57,7 +58,7 @@ export default function MyOrders() {
                   <td>{o.invoice_number}</td>
                   <td>{o.brand_id === 'limt' ? 'LIMT' : 'Tsismis'}</td>
                   <td>{o.event_date || '—'}</td>
-                  <td>${Number(o.amount_due).toFixed(2)}</td>
+                  <td>{money(o.amount_due)}</td>
                   <td><span className={`pill pill--${o.status}`}>{o.status}</span></td>
                 </tr>
               ))}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import { money } from '../invoiceMath'
 
 export default function Orders() {
   const navigate = useNavigate()
@@ -55,7 +56,7 @@ export default function Orders() {
                   <td>{o.clients?.name}</td>
                   <td>{o.brand_id === 'limt' ? 'LIMT' : 'Tsismis'}</td>
                   <td>{o.event_date || '—'}</td>
-                  <td>${Number(o.amount_due).toFixed(2)}</td>
+                  <td>{money(o.amount_due)}</td>
                   <td><span className={`pill pill--${o.status}`}>{o.status}</span></td>
                 </tr>
               ))}

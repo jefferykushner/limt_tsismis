@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { money } from '../invoiceMath'
 
 const emptyForm = { brand_id: 'limt', category: '', name: '', description: '', base_price: '' }
 
@@ -112,7 +113,7 @@ export default function Products() {
                   <td>{p.name}</td>
                   <td>{p.brand_id === 'limt' ? 'LIMT' : 'Tsismis'}</td>
                   <td>{p.category || '—'}</td>
-                  <td>{p.base_price ? `$${Number(p.base_price).toFixed(2)}` : '—'}</td>
+                  <td>{p.base_price ? money(p.base_price) : '—'}</td>
                   <td><span className={`pill ${p.is_active ? 'pill--paid' : 'pill--draft'}`}>{p.is_active ? 'Active' : 'Hidden'}</span></td>
                 </tr>
               ))}

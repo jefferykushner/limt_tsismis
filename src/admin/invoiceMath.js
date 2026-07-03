@@ -53,6 +53,13 @@ function round2(n) {
   return Math.round((n + Number.EPSILON) * 100) / 100
 }
 
+const CAD_FORMATTER = new Intl.NumberFormat('en-CA', {
+  style: 'currency',
+  currency: 'CAD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
 export function money(n) {
-  return `$${Number(n || 0).toFixed(2)}`
+  return CAD_FORMATTER.format(Number(n || 0))
 }

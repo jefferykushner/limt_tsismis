@@ -555,7 +555,7 @@ function OrderEditor({ orderId }) {
           >
             <option value="">Add from catalog…</option>
             {products.map((p) => (
-              <option key={p.id} value={p.id}>{p.name} {p.base_price ? `— $${Number(p.base_price).toFixed(2)}` : ''}</option>
+              <option key={p.id} value={p.id}>{p.name} {p.base_price ? `— ${money(p.base_price)}` : ''}</option>
             ))}
           </select>
           <button className="dash-btn dash-btn--ghost" onClick={addFromCatalog} disabled={!catalogPick} type="button">Add</button>
