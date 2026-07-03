@@ -1,0 +1,121 @@
+/* This block is invisible on screen and only rendered when printing/saving
+   as PDF via the browser's print dialog. Keeps the on-screen editor and the
+   client-facing invoice completely separate so neither compromises the other. */
+
+.invoice-print {
+  display: none;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .invoice-print, .invoice-print * { visibility: visible; }
+  .invoice-print {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 32px 40px;
+    font-family: var(--font-body);
+    color: #201f1c;
+    background: #fff;
+  }
+
+  .invoice-print__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #201f1c;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .invoice-print__brand {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+  }
+  .invoice-print__tagline {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 4px;
+  }
+  .invoice-print__meta {
+    text-align: right;
+    font-size: 0.82rem;
+  }
+  .invoice-print__meta div { margin-bottom: 3px; }
+  .invoice-print__meta b { display: inline-block; width: 110px; text-align: left; }
+
+  .invoice-print__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+  .invoice-print__col-title {
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #777;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+  }
+  .invoice-print__cols p { font-size: 0.85rem; margin: 2px 0; }
+
+  .invoice-print table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 0.82rem;
+  }
+  .invoice-print th {
+    text-align: left;
+    border-bottom: 1.5px solid #201f1c;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .invoice-print td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+  }
+  .invoice-print .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .invoice-print__totals {
+    width: 260px;
+    margin-left: auto;
+    font-size: 0.85rem;
+  }
+  .invoice-print__totals div {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .invoice-print__totals .grand {
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-top: 2px solid #201f1c;
+    border-bottom: none;
+    margin-top: 6px;
+    padding-top: 8px;
+  }
+
+  .invoice-print__notes {
+    margin-top: 24px;
+    font-size: 0.82rem;
+    color: #444;
+  }
+  .invoice-print__footer {
+    margin-top: 40px;
+    text-align: center;
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #777;
+  }
+}
