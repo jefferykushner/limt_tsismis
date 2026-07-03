@@ -1,10 +1,12 @@
 import { Fragment } from 'react'
 import { money, lineItemListTotal, lineItemWaivedAmount } from './invoiceMath'
+import limtLogoFull from '../assets/limt-logo-full.png'
+import tsismisLogoFull from '../assets/tsismis-logo-full.png'
 import './invoice-print.css'
 
 const BRAND_INFO = {
-  limt: { name: 'Love in My Tummy', tagline: 'Made with care. Delivered with love.' },
-  tsismis: { name: 'Tsismis', tagline: 'Filipino-inspired. Made with a little chismis.' },
+  limt: { name: 'Love in My Tummy', tagline: 'Made with care. Delivered with love.', logo: limtLogoFull },
+  tsismis: { name: 'Tsismis', tagline: "You didn't hear this from me.", logo: tsismisLogoFull },
 }
 
 export default function PrintableInvoice({ order, client, lineItems, totals, notes, waivedBreakdown, totalWaived, groupedOrder }) {
@@ -16,8 +18,14 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
     <div className="invoice-print">
       <div className="invoice-print__header">
         <div>
-          <div className="invoice-print__brand">{brand.name}</div>
-          <div className="invoice-print__tagline">{brand.tagline}</div>
+          {brand.logo ? (
+            <img src={brand.logo} alt={brand.name} className="invoice-print__logo" />
+          ) : (
+            <>
+              <div className="invoice-print__brand">{brand.name}</div>
+              <div className="invoice-print__tagline">{brand.tagline}</div>
+            </>
+          )}
         </div>
         <div className="invoice-print__meta">
           <div><b>Invoice #</b>{order.invoice_number}</div>

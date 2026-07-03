@@ -33,6 +33,11 @@
     font-family: var(--font-display);
     font-size: 1.4rem;
   }
+  .invoice-print__logo {
+    max-height: 90px;
+    max-width: 280px;
+    object-fit: contain;
+  }
   .invoice-print__tagline {
     font-family: var(--font-editorial);
     font-style: italic;
