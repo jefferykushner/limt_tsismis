@@ -364,22 +364,26 @@ function OrderEditor({ orderId }) {
         />
       </td>
       <td style={{ width: 80 }} title="Regular price per unit, before any waiver">
-        <input
-          type="number" min="0" step="0.01" value={li.item_price ?? ''}
-          onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
-          onBlur={() => commitLineItem(li.id)}
-          placeholder="—"
-          style={{ ...cellInputStyle, width: 74 }}
-        />
+        {li.item_type === 'fee' ? '—' : (
+          <input
+            type="number" min="0" step="0.01" value={li.item_price ?? ''}
+            onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
+            onBlur={() => commitLineItem(li.id)}
+            placeholder="—"
+            style={{ ...cellInputStyle, width: 74 }}
+          />
+        )}
       </td>
       <td style={{ width: 80 }} title="Additional per-unit cost, e.g. a customization surcharge">
-        <input
-          type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
-          onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
-          onBlur={() => commitLineItem(li.id)}
-          placeholder="—"
-          style={{ ...cellInputStyle, width: 74 }}
-        />
+        {li.item_type === 'fee' ? '—' : (
+          <input
+            type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
+            onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
+            onBlur={() => commitLineItem(li.id)}
+            placeholder="—"
+            style={{ ...cellInputStyle, width: 74 }}
+          />
+        )}
       </td>
       <td style={{ width: 85 }} title="What's actually billed per unit">
         <input

@@ -46,7 +46,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         <div>
           <div className="invoice-print__col-title">Event Details</div>
           <p><strong>Event Date:</strong> {order.event_date || '—'}</p>
-          <p><strong>Fulfillment:</strong> {order.fulfillment || '—'}</p>
+          <p><strong>Fulfillment:</strong> <span className="invoice-print__capitalize">{order.fulfillment || '—'}</span></p>
           {order.fulfillment === 'delivery' && (
             <>
               <p><strong>Delivery Time:</strong> {order.delivery_time || '—'}</p>
@@ -149,37 +149,41 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         </table>
       )}
 
-      <div className="invoice-print__totals">
-        {waivedBreakdown && waivedBreakdown.length > 0 && (
-          <div className="invoice-print__savings">
-            <div className="invoice-print__savings-title">Savings Applied</div>
-            {waivedBreakdown.map((row) => (
-              <div className="invoice-print__savings-row" key={row.id}>
-                <span>{row.label}</span><span>-{money(row.amount)}</span>
+      <div className="invoice-print__bottom-row">
+        <div className="invoice-print__notes-box">
+          {notes && notes.length > 0 ? (
+            notes.map((n) => (
+              <div key={n.id} className="invoice-print__note">
+                <strong>{n.label}:</strong> {n.content}
               </div>
-            ))}
-          </div>
-        )}
-        <div className="invoice-print__totals-row"><span>Subtotal</span><span>{money(totals.subtotal)}</span></div>
-        <div className="invoice-print__totals-row"><span>Tax ({(order.tax_rate * 100).toFixed(0)}%)</span><span>{money(totals.taxAmount)}</span></div>
-        {order.discount_amount > 0 && (
-          <div className="invoice-print__totals-row"><span>{order.discount_label || 'Discount'}</span><span>-{money(order.discount_amount)}</span></div>
-        )}
-        {order.deposit_amount > 0 && (
-          <div className="invoice-print__totals-row"><span>Deposit Paid</span><span>-{money(order.deposit_amount)}</span></div>
-        )}
-        <div className="invoice-print__totals-row grand"><span>Amount Due</span><span>{money(totals.amountDue)}</span></div>
-      </div>
-
-      {notes && notes.length > 0 && (
-        <div className="invoice-print__notes">
-          {notes.map((n) => (
-            <div key={n.id} style={{ marginBottom: 10 }}>
-              <strong>{n.label}:</strong> {n.content}
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="invoice-print__note invoice-print__note--empty">&nbsp;</div>
+          )}
         </div>
-      )}
+
+        <div className="invoice-print__totals">
+          {waivedBreakdown && waivedBreakdown.length > 0 && (
+            <div className="invoice-print__savings">
+              <div className="invoice-print__savings-title">Savings Applied</div>
+              {waivedBreakdown.map((row) => (
+                <div className="invoice-print__savings-row" key={row.id}>
+                  <span>{row.label}</span><span>-{money(row.amount)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="invoice-print__totals-row"><span>Subtotal</span><span>{money(totals.subtotal)}</span></div>
+          <div className="invoice-print__totals-row"><span>Tax ({(order.tax_rate * 100).toFixed(0)}%)</span><span>{money(totals.taxAmount)}</span></div>
+          {order.discount_amount > 0 && (
+            <div className="invoice-print__totals-row"><span>{order.discount_label || 'Discount'}</span><span>-{money(order.discount_amount)}</span></div>
+          )}
+          {order.deposit_amount > 0 && (
+            <div className="invoice-print__totals-row"><span>Deposit Paid</span><span>-{money(order.deposit_amount)}</span></div>
+          )}
+          <div className="invoice-print__totals-row grand"><span>Amount Due</span><span>{money(totals.amountDue)}</span></div>
+        </div>
+      </div>
 
       <div className="invoice-print__footer">Thank you for supporting our small business!</div>
     </div>

@@ -34,10 +34,12 @@
     font-size: 1.4rem;
   }
   .invoice-print__logo {
-    max-height: 90px;
-    max-width: 280px;
+    max-height: 170px;
+    max-width: 380px;
     object-fit: contain;
+    display: block;
   }
+  .invoice-print__capitalize { text-transform: capitalize; }
   .invoice-print__tagline {
     font-family: var(--font-editorial);
     font-style: italic;
@@ -90,9 +92,32 @@
   }
   .invoice-print .num { text-align: right; font-variant-numeric: tabular-nums; }
 
+  .invoice-print__bottom-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    margin-top: 24px;
+  }
+
+  .invoice-print__notes-box {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .invoice-print__note {
+    font-size: 0.8rem;
+    color: #444;
+    line-height: 1.5;
+  }
+  .invoice-print__note--empty { visibility: hidden; }
+
   .invoice-print__totals {
-    width: 260px;
-    margin-left: auto;
+    width: 280px;
+    flex-shrink: 0;
     font-size: 0.85rem;
   }
   .invoice-print__totals-row {
@@ -131,11 +156,6 @@
     padding: 2px 0;
   }
 
-  .invoice-print__notes {
-    margin-top: 24px;
-    font-size: 0.82rem;
-    color: #444;
-  }
   .invoice-print__footer {
     margin-top: 40px;
     text-align: center;

@@ -13,6 +13,7 @@ export function lineItemListTotal(item) {
 }
 
 export function lineItemWaivedAmount(item) {
+  if (item.item_type !== 'product') return 0
   const waived = lineItemListTotal(item) - Number(item.total_price || 0)
   return waived > 0.004 ? round2(waived) : 0
 }
