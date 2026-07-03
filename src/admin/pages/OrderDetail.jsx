@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { calcTotals, calcWaivedBreakdown, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
+import { calcTotals, calcWaivedBreakdown, feesOnly, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
 import PrintableInvoice from '../PrintableInvoice'
 
 const FEE_PRESETS = ['Setup Fee', 'Delivery Fee', 'Service Fee', 'Rush Fee']
@@ -363,18 +363,16 @@ function OrderEditor({ orderId }) {
           style={{ ...cellInputStyle, width: 50 }}
         />
       </td>
-      <td style={{ width: 80 }} title="Regular price per unit, before any waiver">
-        {li.item_type === 'fee' ? '—' : (
-          <input
-            type="number" min="0" step="0.01" value={li.item_price ?? ''}
-            onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
-            onBlur={() => commitLineItem(li.id)}
-            placeholder="—"
-            style={{ ...cellInputStyle, width: 74 }}
-          />
-        )}
+      <td style={{ width: 80 }} title={li.item_type === 'fee' ? "Regular fee amount, before any waiver" : "Regular price per unit, before any waiver"}>
+        <input
+          type="number" min="0" step="0.01" value={li.item_price ?? ''}
+          onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          placeholder="—"
+          style={{ ...cellInputStyle, width: 74 }}
+        />
       </td>
-      <td style={{ width: 80 }} title="Additional per-unit cost, e.g. a customization surcharge">
+      <td style={{ width: 80 }} title="Additional per-unit cost, e.g. a customization surcharge (products only)">
         {li.item_type === 'fee' ? '—' : (
           <input
             type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
@@ -433,6 +431,18 @@ function OrderEditor({ orderId }) {
             <option value="paid">Paid</option>
             <option value="cancelled">Cancelled</option>
           </select>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', color: 'var(--graphite)' }}>
+            <input
+              type="checkbox"
+              checked={!!order.totals_only}
+              onChange={async (e) => {
+                const totals_only = e.target.checked
+                setOrder((o) => ({ ...o, totals_only }))
+                await supabase.from('orders').update({ totals_only }).eq('id', orderId)
+              }}
+            />
+            Totals only
+          </label>
           <button className="dash-btn dash-btn--ghost" onClick={() => window.print()}>Print / Save PDF</button>
           <button className="dash-btn dash-btn--danger" onClick={handleDeleteOrder}>Delete Invoice</button>
         </div>
@@ -667,6 +677,28 @@ function OrderEditor({ orderId }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: 8 }}>
           <span>Tax Amount</span><span>{money(totals.taxAmount)}</span>
         </div>
+
+        {feesOnly(lineItems).length > 0 && (
+          <div style={{ marginBottom: 8, paddingTop: 4, borderTop: '1px dashed var(--fog)' }}>
+            {feesOnly(lineItems).map((fee) => {
+              const waived = lineItemWaivedAmount(fee)
+              return (
+                <div key={fee.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginTop: 6 }}>
+                  <span>{fee.product_type}</span>
+                  <span>
+                    {waived > 0 && (
+                      <span style={{ textDecoration: 'line-through', color: 'var(--graphite)', marginRight: 6 }}>
+                        {money(lineItemListTotal(fee))}
+                      </span>
+                    )}
+                    {money(fee.total_price)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.9rem', marginBottom: 8 }}>
           <input
             placeholder="Discount label (e.g. Courtesy discount)"

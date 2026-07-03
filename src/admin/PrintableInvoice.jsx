@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
-import { money, lineItemListTotal, lineItemWaivedAmount } from './invoiceMath'
+import { createPortal } from 'react-dom'
+import { money, lineItemListTotal, lineItemWaivedAmount, feesOnly } from './invoiceMath'
 import limtLogoFull from '../assets/limt-logo-full.png'
 import tsismisLogoFull from '../assets/tsismis-logo-full.png'
 import './invoice-print.css'
@@ -9,12 +10,16 @@ const BRAND_INFO = {
   tsismis: { name: 'Tsismis', tagline: "You didn't hear this from me.", logo: tsismisLogoFull },
 }
 
-export default function PrintableInvoice({ order, client, lineItems, totals, notes, waivedBreakdown, totalWaived, groupedOrder }) {
+export default function PrintableInvoice({ order, client, lineItems, totals, notes, waivedBreakdown, groupedOrder }) {
   const brand = BRAND_INFO[order.brand_id] || BRAND_INFO.limt
-  const fees = lineItems.filter((i) => i.item_type === 'fee')
   const productGroups = (groupedOrder || []).filter((e) => e.type === 'group' || e.item?.item_type === 'product')
+  const fees = feesOnly(lineItems)
+  const totalsOnly = !!order.totals_only
 
-  return (
+  const printRoot = document.getElementById('print-root')
+  if (!printRoot) return null
+
+  return createPortal(
     <div className="invoice-print">
       <div className="invoice-print__header">
         <div>
@@ -57,7 +62,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         </div>
       </div>
 
-      {productGroups.length > 0 && (
+      {!totalsOnly && productGroups.length > 0 && (
         <table>
           <thead>
             <tr>
@@ -130,40 +135,17 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         </table>
       )}
 
-      {fees.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Additional Fees</th>
-              <th className="num">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fees.map((item) => (
-              <tr key={item.id}>
-                <td>{item.product_type}</td>
-                <td className="num">{money(item.total_price)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
       <div className="invoice-print__bottom-row">
         <div className="invoice-print__notes-box">
-          {notes && notes.length > 0 ? (
-            notes.map((n) => (
-              <div key={n.id} className="invoice-print__note">
-                <strong>{n.label}:</strong> {n.content}
-              </div>
-            ))
-          ) : (
-            <div className="invoice-print__note invoice-print__note--empty">&nbsp;</div>
-          )}
+          {notes && notes.length > 0 && notes.map((n) => (
+            <div key={n.id} className="invoice-print__note">
+              <strong>{n.label}:</strong> {n.content}
+            </div>
+          ))}
         </div>
 
         <div className="invoice-print__totals">
-          {waivedBreakdown && waivedBreakdown.length > 0 && (
+          {!totalsOnly && waivedBreakdown && waivedBreakdown.length > 0 && (
             <div className="invoice-print__savings">
               <div className="invoice-print__savings-title">Savings Applied</div>
               {waivedBreakdown.map((row) => (
@@ -173,8 +155,27 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
               ))}
             </div>
           )}
+
           <div className="invoice-print__totals-row"><span>Subtotal</span><span>{money(totals.subtotal)}</span></div>
           <div className="invoice-print__totals-row"><span>Tax ({(order.tax_rate * 100).toFixed(0)}%)</span><span>{money(totals.taxAmount)}</span></div>
+
+          {fees.map((fee) => {
+            const waived = lineItemWaivedAmount(fee)
+            return (
+              <div className="invoice-print__totals-row" key={fee.id}>
+                <span>{fee.product_type}</span>
+                <span>
+                  {waived > 0 && (
+                    <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 6 }}>
+                      {money(lineItemListTotal(fee))}
+                    </span>
+                  )}
+                  {money(fee.total_price)}
+                </span>
+              </div>
+            )
+          })}
+
           {order.discount_amount > 0 && (
             <div className="invoice-print__totals-row"><span>{order.discount_label || 'Discount'}</span><span>-{money(order.discount_amount)}</span></div>
           )}
@@ -186,6 +187,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
       </div>
 
       <div className="invoice-print__footer">Thank you for supporting our small business!</div>
-    </div>
+    </div>,
+    printRoot
   )
 }
