@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { createPortal } from 'react-dom'
-import { money, lineItemListTotal, lineItemWaivedAmount, feesOnly } from './invoiceMath'
+import { money, lineItemListTotal, lineItemWaivedAmount, feesOnly, titleCase } from './invoiceMath'
 import limtLogoFull from '../assets/limt-logo-full.png'
 import tsismisLogoFull from '../assets/tsismis-logo-full.png'
 import './invoice-print.css'
@@ -35,7 +35,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         <div className="invoice-print__meta">
           <div><b>Invoice #</b>{order.invoice_number}</div>
           <div><b>Order Date</b>{order.order_date}</div>
-          <div><b>Status</b><span className="invoice-print__capitalize">{order.status}</span></div>
+          <div><b>Status</b>{titleCase(order.status)}</div>
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
         <div>
           <div className="invoice-print__col-title">Event Details</div>
           <p><strong>Event Date:</strong> {order.event_date || '—'}</p>
-          <p><strong>Fulfillment:</strong> <span className="invoice-print__capitalize">{order.fulfillment || '—'}</span></p>
+          <p><strong>Fulfillment:</strong> {titleCase(order.fulfillment) || '—'}</p>
           {order.fulfillment === 'delivery' && (
             <>
               <p><strong>Delivery Time:</strong> {order.delivery_time || '—'}</p>

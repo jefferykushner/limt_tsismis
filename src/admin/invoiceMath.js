@@ -63,3 +63,8 @@ const CAD_FORMATTER = new Intl.NumberFormat('en-CA', {
 export function money(n) {
   return CAD_FORMATTER.format(Number(n || 0))
 }
+
+export function titleCase(s) {
+  if (!s) return s
+  return s.replace(/\w\S*/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase())
+}

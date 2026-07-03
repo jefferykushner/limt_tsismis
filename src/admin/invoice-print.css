@@ -36,8 +36,8 @@
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 2px solid #201f1c;
-    padding-bottom: 8px;
-    margin-bottom: 10px;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
   }
   .invoice-print__brand {
     font-family: var(--font-display);
@@ -49,7 +49,6 @@
     object-fit: contain;
     display: block;
   }
-  .invoice-print__capitalize { text-transform: capitalize; }
   .invoice-print__tagline {
     font-family: var(--font-editorial);
     font-style: italic;
@@ -68,7 +67,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
   .invoice-print__col-title {
     font-family: var(--font-display);
@@ -77,8 +76,8 @@
     text-transform: uppercase;
     color: #777;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 4px;
-    margin-bottom: 8px;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
   }
   .invoice-print__cols p { font-size: 0.57rem; margin: 2px 0; }
 
@@ -86,7 +85,7 @@
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     font-size: 0.56rem;
   }
   .invoice-print table col.col-category { width: 11%; }
@@ -98,13 +97,13 @@
   .invoice-print th {
     text-align: left;
     border-bottom: 1.5px solid #201f1c;
-    padding: 3px 8px;
+    padding: 5px 8px;
     font-size: 0.45rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
   .invoice-print td {
-    padding: 3px 8px;
+    padding: 5px 8px;
     border-bottom: 1px solid #ddd;
   }
   .invoice-print .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -113,7 +112,7 @@
     display: flex;
     align-items: flex-start;
     gap: 28px;
-    margin-top: 10px;
+    margin-top: 20px;
   }
 
   .invoice-print__notes-box {
@@ -121,7 +120,7 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 16px;
   }
   .invoice-print__note {
     font-size: 0.55rem;
@@ -151,8 +150,8 @@
 
   .invoice-print__savings {
     display: block;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
     border-bottom: 1px dashed #ccc;
   }
   .invoice-print__savings-title {
@@ -171,7 +170,7 @@
   }
 
   .invoice-print__footer {
-    margin-top: 4px;
+    margin-top: 20px;
     text-align: center;
     font-family: var(--font-editorial);
     font-style: italic;
