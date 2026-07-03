@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabaseClient'
 import './Login.css'
 
 export default function Login() {
@@ -18,15 +19,26 @@ export default function Login() {
     e.preventDefault()
     setError(null)
     setSubmitting(true)
-    const { error } = await signIn(email, password)
-    setSubmitting(false)
+
+    const { data, error } = await signIn(email, password)
     if (error) {
+      setSubmitting(false)
       setError('Email or password not recognized. Please try again.')
       return
     }
-    // Land on wherever they were headed, or default to the account portal —
-    // AdminRoute will redirect admins onward if this turns out to be an admin.
-    navigate(from || '/account', { replace: true })
+
+    // Check staff membership directly rather than reading it off context —
+    // the context's role lookup runs async off the auth-state-change event,
+    // so it may not have resolved yet at this exact moment.
+    const { data: staffRow } = await supabase
+      .from('staff')
+      .select('user_id')
+      .eq('user_id', data.user.id)
+      .maybeSingle()
+
+    setSubmitting(false)
+    const destination = staffRow ? '/admin' : (from || '/account')
+    navigate(destination, { replace: true })
   }
 
   return (
