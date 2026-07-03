@@ -43,6 +43,8 @@ export default function Footer() {
         <div className="footer__bottom">
           <p className="footer__legal">
             © {new Date().getFullYear()} Love in My Tummy. All rights reserved. Toronto, Ontario.
+            {' · '}
+            <Link to="/login" className="footer__login-link">Client Login</Link>
           </p>
           <div className="footer__social">
             <a href="https://instagram.com/loveinmytummy" target="_blank" rel="noreferrer">Instagram</a>

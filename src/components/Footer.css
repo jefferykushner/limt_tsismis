@@ -90,6 +90,14 @@
   letter-spacing: 0.04em;
 }
 
+.footer__login-link {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--ease);
+}
+.footer__login-link:hover { color: var(--blush); }
+
 .footer__social {
   display: flex;
   gap: 20px;
