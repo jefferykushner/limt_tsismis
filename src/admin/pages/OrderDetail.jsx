@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { calcTotals, money } from '../invoiceMath'
+import { calcTotals, calcWaivedBreakdown, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
 import PrintableInvoice from '../PrintableInvoice'
 
 const FEE_PRESETS = ['Setup Fee', 'Delivery Fee', 'Service Fee', 'Rush Fee']
+const NOTE_PRESETS = ['Special Instructions', 'Delivery Details', 'Disclaimer']
 
 export default function OrderDetail() {
   const { id } = useParams()
@@ -98,32 +99,39 @@ function NewOrderSetup() {
   )
 }
 
+const inputStyle = { padding: '9px 12px', border: '1px solid var(--fog)', borderRadius: 8, fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'none' }
+const cellInputStyle = { width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }
+
 /* ── Step 2: the real editor, once an order row exists ── */
 function OrderEditor({ orderId }) {
   const [order, setOrder] = useState(null)
   const [client, setClient] = useState(null)
   const [lineItems, setLineItems] = useState([])
   const [products, setProducts] = useState([])
+  const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
   const [catalogPick, setCatalogPick] = useState('')
-  const [manualItem, setManualItem] = useState({ category: '', product_type: '', details: '', quantity: 1, bill_price: '' })
+  const [manualItem, setManualItem] = useState({ group_name: '', category: '', product_type: '', details: '', quantity: 1, item_price: '', addl_cost: '', bill_price: '' })
+  const [newNote, setNewNote] = useState({ label: NOTE_PRESETS[0], customLabel: '', content: '' })
 
   const load = async () => {
     setLoading(true)
     const { data: orderData } = await supabase.from('orders').select('*').eq('id', orderId).single()
     if (orderData) {
       setOrder(orderData)
-      const [{ data: clientData }, { data: itemsData }, { data: productsData }] = await Promise.all([
+      const [{ data: clientData }, { data: itemsData }, { data: productsData }, { data: notesData }] = await Promise.all([
         supabase.from('clients').select('*').eq('id', orderData.client_id).single(),
         supabase.from('line_items').select('*').eq('order_id', orderId).order('sort_order'),
         supabase.from('products').select('*').eq('brand_id', orderData.brand_id).eq('is_active', true).order('category'),
+        supabase.from('order_notes').select('*').eq('order_id', orderId).order('sort_order'),
       ])
       setClient(clientData || null)
       setLineItems(itemsData || [])
       setProducts(productsData || [])
+      setNotes(notesData || [])
     }
     setLoading(false)
   }
@@ -138,6 +146,11 @@ function OrderEditor({ orderId }) {
         depositAmount: order.deposit_amount,
       })
     : { subtotal: 0, taxAmount: 0, amountDue: 0 }
+
+  const waivedBreakdown = calcWaivedBreakdown(lineItems)
+  const totalWaived = waivedBreakdown.reduce((sum, row) => sum + row.amount, 0)
+
+  const existingGroupNames = [...new Set(lineItems.map((li) => li.group_name).filter(Boolean))]
 
   const persistTotals = async (items = lineItems, orderState = order) => {
     const t = calcTotals({
@@ -165,6 +178,7 @@ function OrderEditor({ orderId }) {
       category: product.category,
       product_type: product.name,
       quantity: qty,
+      item_price: price,
       bill_price: price,
       total_price: qty * price,
     }).select().single()
@@ -180,21 +194,24 @@ function OrderEditor({ orderId }) {
     e.preventDefault()
     if (!manualItem.product_type.trim()) return
     const qty = Number(manualItem.quantity || 1)
-    const price = Number(manualItem.bill_price || 0)
+    const billPrice = Number(manualItem.bill_price || 0)
     const { data, error } = await supabase.from('line_items').insert({
       order_id: orderId,
       item_type: 'product',
+      group_name: manualItem.group_name.trim() || null,
       category: manualItem.category.trim() || null,
       product_type: manualItem.product_type.trim(),
       details: manualItem.details.trim() || null,
       quantity: qty,
-      bill_price: price,
-      total_price: qty * price,
+      item_price: manualItem.item_price === '' ? null : Number(manualItem.item_price),
+      addl_cost: manualItem.addl_cost === '' ? null : Number(manualItem.addl_cost),
+      bill_price: billPrice,
+      total_price: qty * billPrice,
     }).select().single()
     if (!error) {
       const updated = [...lineItems, data]
       setLineItems(updated)
-      setManualItem({ category: '', product_type: '', details: '', quantity: 1, bill_price: '' })
+      setManualItem({ group_name: '', category: manualItem.category, product_type: '', details: '', quantity: 1, item_price: '', addl_cost: '', bill_price: '' })
       persistTotals(updated)
     }
   }
@@ -230,10 +247,13 @@ function OrderEditor({ orderId }) {
     const item = lineItems.find((li) => li.id === itemId)
     if (!item) return
     await supabase.from('line_items').update({
+      group_name: item.group_name,
       category: item.category,
       product_type: item.product_type,
       details: item.details,
       quantity: item.quantity,
+      item_price: item.item_price === '' ? null : item.item_price,
+      addl_cost: item.addl_cost === '' ? null : item.addl_cost,
       bill_price: item.bill_price,
       total_price: item.total_price,
     }).eq('id', itemId)
@@ -261,7 +281,122 @@ function OrderEditor({ orderId }) {
 
   const toggleFlag = (field) => setOrder((o) => ({ ...o, [field]: !o[field] }))
 
+  const addNote = async () => {
+    const label = newNote.label === 'Custom…' ? newNote.customLabel.trim() : newNote.label
+    if (!label || !newNote.content.trim()) return
+    const { data, error } = await supabase.from('order_notes').insert({
+      order_id: orderId,
+      label,
+      content: newNote.content.trim(),
+      sort_order: notes.length,
+    }).select().single()
+    if (!error) {
+      setNotes([...notes, data])
+      setNewNote({ label: NOTE_PRESETS[0], customLabel: '', content: '' })
+    }
+  }
+
+  const deleteNote = async (noteId) => {
+    await supabase.from('order_notes').delete().eq('id', noteId)
+    setNotes(notes.filter((n) => n.id !== noteId))
+  }
+
   if (loading || !order) return <div className="dash-empty">Loading invoice…</div>
+
+  // Group line items for display: grouped rows are clustered under a shared
+  // header with a rollup, ungrouped rows render individually as before.
+  const groupedOrder = []
+  const seenGroups = new Set()
+  lineItems.forEach((li) => {
+    if (li.group_name) {
+      if (!seenGroups.has(li.group_name)) {
+        seenGroups.add(li.group_name)
+        groupedOrder.push({ type: 'group', name: li.group_name, items: lineItems.filter((x) => x.group_name === li.group_name) })
+      }
+    } else {
+      groupedOrder.push({ type: 'single', item: li })
+    }
+  })
+
+  const renderEditableRow = (li) => (
+    <tr key={li.id} style={{ cursor: 'default' }}>
+      <td style={{ width: 100 }}>
+        {li.item_type === 'fee' ? 'Fee' : (
+          <input
+            value={li.category || ''}
+            onChange={(e) => handleLineItemChange(li.id, 'category', e.target.value)}
+            onBlur={() => commitLineItem(li.id)}
+            placeholder="Category"
+            style={cellInputStyle}
+          />
+        )}
+      </td>
+      <td style={{ minWidth: 130 }}>
+        <input
+          value={li.product_type || ''}
+          onChange={(e) => handleLineItemChange(li.id, 'product_type', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          style={cellInputStyle}
+        />
+      </td>
+      <td style={{ minWidth: 140 }}>
+        <input
+          value={li.details || ''}
+          onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          placeholder="Details"
+          style={cellInputStyle}
+        />
+      </td>
+      <td style={{ width: 55 }}>
+        <input
+          type="number" min="0" step="1" value={li.quantity ?? 1}
+          onChange={(e) => handleLineItemChange(li.id, 'quantity', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          style={{ ...cellInputStyle, width: 50 }}
+        />
+      </td>
+      <td style={{ width: 80 }} title="Regular price per unit, before any waiver">
+        <input
+          type="number" min="0" step="0.01" value={li.item_price ?? ''}
+          onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          placeholder="—"
+          style={{ ...cellInputStyle, width: 74 }}
+        />
+      </td>
+      <td style={{ width: 80 }} title="Additional per-unit cost, e.g. a customization surcharge">
+        <input
+          type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
+          onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          placeholder="—"
+          style={{ ...cellInputStyle, width: 74 }}
+        />
+      </td>
+      <td style={{ width: 85 }} title="What's actually billed per unit">
+        <input
+          type="number" min="0" step="0.01" value={li.bill_price ?? 0}
+          onChange={(e) => handleLineItemChange(li.id, 'bill_price', e.target.value)}
+          onBlur={() => commitLineItem(li.id)}
+          style={{ ...cellInputStyle, width: 78 }}
+        />
+      </td>
+      <td>
+        {lineItemWaivedAmount(li) > 0 && (
+          <span style={{ textDecoration: 'line-through', color: 'var(--graphite)', marginRight: 6, fontSize: '0.82rem' }}>
+            {money(lineItemListTotal(li))}
+          </span>
+        )}
+        {money(li.total_price)}
+      </td>
+      <td>
+        <button className="dash-btn--ghost dash-btn" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => deleteLineItem(li.id)}>
+          Remove
+        </button>
+      </td>
+    </tr>
+  )
 
   return (
     <div>
@@ -310,7 +445,7 @@ function OrderEditor({ orderId }) {
             <select
               value={order.fulfillment || ''}
               onChange={(e) => setOrder({ ...order, fulfillment: e.target.value })}
-              style={{ padding: '9px 12px', border: '1px solid var(--fog)', borderRadius: 8, fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'none' }}
+              style={inputStyle}
             >
               <option value="">—</option>
               <option value="delivery">Delivery</option>
@@ -343,11 +478,6 @@ function OrderEditor({ orderId }) {
           ))}
         </div>
 
-        <label className="dash-field" style={{ marginTop: 18 }}>
-          <span>Special Instructions</span>
-          <textarea rows={3} value={order.special_instructions || ''} onChange={(e) => setOrder({ ...order, special_instructions: e.target.value })} />
-        </label>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 18 }}>
           <button className="dash-btn" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save Details'}</button>
           {saved && <span className="dash-saved">Saved</span>}
@@ -361,64 +491,36 @@ function OrderEditor({ orderId }) {
           <table className="dash-table" style={{ marginBottom: 18 }}>
             <thead>
               <tr>
-                <th>Type</th><th>Item</th><th>Details</th><th>Qty</th><th>Price</th><th>Total</th><th></th>
+                <th>Type</th><th>Item</th><th>Details</th><th>Qty</th>
+                <th title="Regular price per unit">Reg. Price</th>
+                <th title="Additional per-unit cost">Add'l</th>
+                <th title="What's actually billed per unit">Bill Price</th>
+                <th>Total</th><th></th>
               </tr>
             </thead>
             <tbody>
-              {lineItems.map((li) => (
-                <tr key={li.id} style={{ cursor: 'default' }}>
-                  <td style={{ width: 110 }}>
-                    {li.item_type === 'fee' ? 'Fee' : (
-                      <input
-                        value={li.category || ''}
-                        onChange={(e) => handleLineItemChange(li.id, 'category', e.target.value)}
-                        onBlur={() => commitLineItem(li.id)}
-                        placeholder="Category"
-                        style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
-                      />
-                    )}
-                  </td>
-                  <td style={{ minWidth: 140 }}>
-                    <input
-                      value={li.product_type || ''}
-                      onChange={(e) => handleLineItemChange(li.id, 'product_type', e.target.value)}
-                      onBlur={() => commitLineItem(li.id)}
-                      style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
-                    />
-                  </td>
-                  <td style={{ minWidth: 160 }}>
-                    <input
-                      value={li.details || ''}
-                      onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
-                      onBlur={() => commitLineItem(li.id)}
-                      placeholder="Details"
-                      style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
-                    />
-                  </td>
-                  <td style={{ width: 70 }}>
-                    <input
-                      type="number" min="0" step="1" value={li.quantity ?? 1}
-                      onChange={(e) => handleLineItemChange(li.id, 'quantity', e.target.value)}
-                      onBlur={() => commitLineItem(li.id)}
-                      style={{ width: 60, padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
-                    />
-                  </td>
-                  <td style={{ width: 100 }}>
-                    <input
-                      type="number" min="0" step="0.01" value={li.bill_price ?? 0}
-                      onChange={(e) => handleLineItemChange(li.id, 'bill_price', e.target.value)}
-                      onBlur={() => commitLineItem(li.id)}
-                      style={{ width: 90, padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
-                    />
-                  </td>
-                  <td>{money(li.total_price)}</td>
-                  <td>
-                    <button className="dash-btn--ghost dash-btn" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => deleteLineItem(li.id)}>
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {groupedOrder.map((entry, idx) => {
+                if (entry.type === 'single') return renderEditableRow(entry.item)
+                const groupTotal = entry.items.reduce((s, i) => s + Number(i.total_price || 0), 0)
+                const groupQty = entry.items.reduce((s, i) => s + Number(i.quantity || 0), 0)
+                return (
+                  <Fragment key={`group-${entry.name}-${idx}`}>
+                    <tr>
+                      <td colSpan={9} style={{ background: 'var(--cream)', fontWeight: 600, fontSize: '0.8rem' }}>
+                        {entry.name}
+                      </td>
+                    </tr>
+                    {entry.items.map(renderEditableRow)}
+                    <tr style={{ fontWeight: 600 }}>
+                      <td colSpan={3}>TOTAL {entry.name.toUpperCase()}</td>
+                      <td>{groupQty}</td>
+                      <td></td><td></td><td></td>
+                      <td>{money(groupTotal)}</td>
+                      <td></td>
+                    </tr>
+                  </Fragment>
+                )
+              })}
             </tbody>
           </table>
         )}
@@ -427,7 +529,7 @@ function OrderEditor({ orderId }) {
           <select
             value={catalogPick}
             onChange={(e) => setCatalogPick(e.target.value)}
-            style={{ flex: 1, minWidth: 200, padding: '9px 12px', border: '1px solid var(--fog)', borderRadius: 8, fontFamily: 'var(--font-body)', fontSize: '0.9rem' }}
+            style={{ flex: 1, minWidth: 200, ...inputStyle }}
           >
             <option value="">Add from catalog…</option>
             {products.map((p) => (
@@ -437,13 +539,32 @@ function OrderEditor({ orderId }) {
           <button className="dash-btn dash-btn--ghost" onClick={addFromCatalog} disabled={!catalogPick} type="button">Add</button>
         </div>
 
-        <form className="dash-inline-form" onSubmit={addManualItem} style={{ marginBottom: 14 }}>
-          <input placeholder="Category" value={manualItem.category} onChange={(e) => setManualItem({ ...manualItem, category: e.target.value })} style={{ maxWidth: 120 }} />
-          <input placeholder="Item name" value={manualItem.product_type} onChange={(e) => setManualItem({ ...manualItem, product_type: e.target.value })} required />
-          <input placeholder="Details" value={manualItem.details} onChange={(e) => setManualItem({ ...manualItem, details: e.target.value })} />
-          <input type="number" min="0" placeholder="Qty" value={manualItem.quantity} onChange={(e) => setManualItem({ ...manualItem, quantity: e.target.value })} style={{ maxWidth: 70 }} />
-          <input type="number" min="0" step="0.01" placeholder="Price" value={manualItem.bill_price} onChange={(e) => setManualItem({ ...manualItem, bill_price: e.target.value })} style={{ maxWidth: 100 }} />
-          <button className="dash-btn" type="submit">Add Custom Item</button>
+        <form onSubmit={addManualItem} style={{ marginBottom: 14, padding: 14, background: 'var(--cream)', borderRadius: 8 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 8 }}>
+            <input
+              list="group-name-options"
+              placeholder="Group (optional, e.g. Charcuterie Boxes)"
+              value={manualItem.group_name}
+              onChange={(e) => setManualItem({ ...manualItem, group_name: e.target.value })}
+              style={{ minWidth: 220 }}
+            />
+            <datalist id="group-name-options">
+              {existingGroupNames.map((g) => <option key={g} value={g} />)}
+            </datalist>
+            <input placeholder="Category" value={manualItem.category} onChange={(e) => setManualItem({ ...manualItem, category: e.target.value })} style={{ maxWidth: 120 }} />
+          </div>
+          <div className="dash-inline-form" style={{ marginBottom: 0 }}>
+            <input placeholder="Item / variation name" value={manualItem.product_type} onChange={(e) => setManualItem({ ...manualItem, product_type: e.target.value })} required />
+            <input placeholder="Details" value={manualItem.details} onChange={(e) => setManualItem({ ...manualItem, details: e.target.value })} />
+            <input type="number" min="0" placeholder="Qty" value={manualItem.quantity} onChange={(e) => setManualItem({ ...manualItem, quantity: e.target.value })} style={{ maxWidth: 65 }} />
+            <input type="number" min="0" step="0.01" placeholder="Reg. price" value={manualItem.item_price} onChange={(e) => setManualItem({ ...manualItem, item_price: e.target.value })} style={{ maxWidth: 95 }} title="Optional: the regular price, if different from what's billed" />
+            <input type="number" min="0" step="0.01" placeholder="Add'l" value={manualItem.addl_cost} onChange={(e) => setManualItem({ ...manualItem, addl_cost: e.target.value })} style={{ maxWidth: 80 }} title="Optional: additional per-unit cost" />
+            <input type="number" min="0" step="0.01" placeholder="Bill price" value={manualItem.bill_price} onChange={(e) => setManualItem({ ...manualItem, bill_price: e.target.value })} style={{ maxWidth: 95 }} required />
+            <button className="dash-btn" type="submit">Add Item</button>
+          </div>
+          <p style={{ fontSize: '0.74rem', color: 'var(--graphite)', marginTop: 8 }}>
+            Leave "Reg. price" and "Add'l" blank for a normal item. Fill them in only when the regular price is higher than what you're billing — the difference shows as a waived amount on the invoice.
+          </p>
         </form>
 
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -455,8 +576,70 @@ function OrderEditor({ orderId }) {
         </div>
       </div>
 
-      <div className="dash-card no-print" style={{ maxWidth: 420, marginLeft: 'auto' }}>
+      <div className="dash-card no-print" style={{ marginBottom: 20 }}>
+        <div className="dash-section-label" style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <NoteIcon /> Special Instructions &amp; Notes
+        </div>
+
+        {notes.length > 0 && (
+          <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {notes.map((n) => (
+              <div key={n.id} style={{ padding: 12, background: 'var(--cream)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--graphite)' }}>{n.label}</div>
+                  <div style={{ fontSize: '0.88rem', marginTop: 4 }}>{n.content}</div>
+                </div>
+                <button className="dash-btn dash-btn--ghost" style={{ fontSize: '0.72rem', padding: '4px 10px', height: 'fit-content' }} onClick={() => deleteNote(n.id)}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <select
+            value={newNote.label}
+            onChange={(e) => setNewNote({ ...newNote, label: e.target.value })}
+            style={{ ...inputStyle, width: 180 }}
+          >
+            {NOTE_PRESETS.map((p) => <option key={p} value={p}>{p}</option>)}
+            <option value="Custom…">Custom…</option>
+          </select>
+          {newNote.label === 'Custom…' && (
+            <input
+              placeholder="Custom label"
+              value={newNote.customLabel}
+              onChange={(e) => setNewNote({ ...newNote, customLabel: e.target.value })}
+              style={{ width: 160 }}
+            />
+          )}
+          <textarea
+            placeholder="Note content…"
+            rows={2}
+            value={newNote.content}
+            onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
+            style={{ flex: 1, minWidth: 220, padding: '9px 12px', border: '1px solid var(--fog)', borderRadius: 8, fontFamily: 'var(--font-body)', fontSize: '0.9rem' }}
+          />
+          <button className="dash-btn" type="button" onClick={addNote}>Add Note</button>
+        </div>
+      </div>
+
+      <div className="dash-card no-print" style={{ maxWidth: 440, marginLeft: 'auto' }}>
         <div className="dash-section-label" style={{ marginBottom: 14 }}>Totals</div>
+
+        {waivedBreakdown.length > 0 && (
+          <div style={{ marginBottom: 14, padding: 10, background: 'var(--cream)', borderRadius: 8 }}>
+            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--graphite)', marginBottom: 6 }}>Savings Applied</div>
+            {waivedBreakdown.map((row) => (
+              <div key={row.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: 3 }}>
+                <span>{row.label}</span><span>-{money(row.amount)}</span>
+              </div>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 600, marginTop: 4, borderTop: '1px solid var(--fog)', paddingTop: 4 }}>
+              <span>Total Savings</span><span>-{money(totalWaived)}</span>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: 8 }}>
           <span>Subtotal</span><span>{money(totals.subtotal)}</span>
         </div>
@@ -472,8 +655,14 @@ function OrderEditor({ orderId }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: 8 }}>
           <span>Tax Amount</span><span>{money(totals.taxAmount)}</span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.9rem', marginBottom: 8 }}>
-          <span>Discount</span>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.9rem', marginBottom: 8 }}>
+          <input
+            placeholder="Discount label (e.g. Courtesy discount)"
+            value={order.discount_label || ''}
+            onChange={(e) => setOrder({ ...order, discount_label: e.target.value })}
+            onBlur={handleSaveOrder}
+            style={{ flex: 1, padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6, fontSize: '0.82rem' }}
+          />
           <input
             type="number" step="0.01" min="0" value={order.discount_amount}
             onChange={(e) => setOrder({ ...order, discount_amount: e.target.value })}
@@ -495,7 +684,17 @@ function OrderEditor({ orderId }) {
         </div>
       </div>
 
-      <PrintableInvoice order={order} client={client} lineItems={lineItems} totals={totals} />
+      <PrintableInvoice order={order} client={client} lineItems={lineItems} totals={totals} notes={notes} waivedBreakdown={waivedBreakdown} totalWaived={totalWaived} groupedOrder={groupedOrder} />
     </div>
+  )
+}
+
+function NoteIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ color: 'var(--blush)', flexShrink: 0 }}>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M9 3h6v3H9z" />
+      <path d="M9 12h6M9 16h4" />
+    </svg>
   )
 }

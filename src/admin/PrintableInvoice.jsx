@@ -1,4 +1,5 @@
-import { money } from './invoiceMath'
+import { Fragment } from 'react'
+import { money, lineItemListTotal, lineItemWaivedAmount } from './invoiceMath'
 import './invoice-print.css'
 
 const BRAND_INFO = {
@@ -6,10 +7,10 @@ const BRAND_INFO = {
   tsismis: { name: 'Tsismis', tagline: 'Filipino-inspired. Made with a little chismis.' },
 }
 
-export default function PrintableInvoice({ order, client, lineItems, totals }) {
+export default function PrintableInvoice({ order, client, lineItems, totals, notes, waivedBreakdown, totalWaived, groupedOrder }) {
   const brand = BRAND_INFO[order.brand_id] || BRAND_INFO.limt
-  const products = lineItems.filter((i) => i.item_type === 'product')
   const fees = lineItems.filter((i) => i.item_type === 'fee')
+  const productGroups = (groupedOrder || []).filter((e) => e.type === 'group' || e.item?.item_type === 'product')
 
   return (
     <div className="invoice-print">
@@ -48,7 +49,7 @@ export default function PrintableInvoice({ order, client, lineItems, totals }) {
         </div>
       </div>
 
-      {products.length > 0 && (
+      {productGroups.length > 0 && (
         <table>
           <thead>
             <tr>
@@ -56,21 +57,67 @@ export default function PrintableInvoice({ order, client, lineItems, totals }) {
               <th>Item</th>
               <th>Details</th>
               <th className="num">Qty</th>
-              <th className="num">Unit Price</th>
+              <th className="num">Price</th>
               <th className="num">Total</th>
             </tr>
           </thead>
           <tbody>
-            {products.map((item) => (
-              <tr key={item.id}>
-                <td>{item.category || '—'}</td>
-                <td>{item.product_type}</td>
-                <td>{item.details || '—'}</td>
-                <td className="num">{item.quantity}</td>
-                <td className="num">{money(item.bill_price)}</td>
-                <td className="num">{money(item.total_price)}</td>
-              </tr>
-            ))}
+            {productGroups.map((entry, idx) => {
+              if (entry.type === 'single') {
+                const li = entry.item
+                const waived = lineItemWaivedAmount(li)
+                return (
+                  <tr key={li.id}>
+                    <td>{li.category || '—'}</td>
+                    <td>{li.product_type}</td>
+                    <td>{li.details || '—'}</td>
+                    <td className="num">{li.quantity}</td>
+                    <td className="num">{money(li.bill_price)}</td>
+                    <td className="num">
+                      {waived > 0 && (
+                        <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 6 }}>
+                          {money(lineItemListTotal(li))}
+                        </span>
+                      )}
+                      {money(li.total_price)}
+                    </td>
+                  </tr>
+                )
+              }
+              const groupTotal = entry.items.reduce((s, i) => s + Number(i.total_price || 0), 0)
+              const groupQty = entry.items.reduce((s, i) => s + Number(i.quantity || 0), 0)
+              return (
+                <Fragment key={`g-${idx}`}>
+                  <tr><td colSpan={6} style={{ fontWeight: 700, paddingTop: 10 }}>{entry.name}</td></tr>
+                  {entry.items.map((li) => {
+                    const waived = lineItemWaivedAmount(li)
+                    return (
+                      <tr key={li.id}>
+                        <td></td>
+                        <td style={{ paddingLeft: 14 }}>{li.product_type}</td>
+                        <td>{li.details || '—'}</td>
+                        <td className="num">{li.quantity}</td>
+                        <td className="num">{money(li.bill_price)}</td>
+                        <td className="num">
+                          {waived > 0 && (
+                            <span style={{ textDecoration: 'line-through', color: '#999', marginRight: 6 }}>
+                              {money(lineItemListTotal(li))}
+                            </span>
+                          )}
+                          {money(li.total_price)}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  <tr style={{ fontWeight: 700 }}>
+                    <td colSpan={3}>TOTAL {entry.name.toUpperCase()}</td>
+                    <td className="num">{groupQty}</td>
+                    <td></td>
+                    <td className="num">{money(groupTotal)}</td>
+                  </tr>
+                </Fragment>
+              )
+            })}
           </tbody>
         </table>
       )}
@@ -95,20 +142,34 @@ export default function PrintableInvoice({ order, client, lineItems, totals }) {
       )}
 
       <div className="invoice-print__totals">
-        <div><span>Subtotal</span><span>{money(totals.subtotal)}</span></div>
-        <div><span>Tax ({(order.tax_rate * 100).toFixed(0)}%)</span><span>{money(totals.taxAmount)}</span></div>
+        {waivedBreakdown && waivedBreakdown.length > 0 && (
+          <div className="invoice-print__savings">
+            <div className="invoice-print__savings-title">Savings Applied</div>
+            {waivedBreakdown.map((row) => (
+              <div className="invoice-print__savings-row" key={row.id}>
+                <span>{row.label}</span><span>-{money(row.amount)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="invoice-print__totals-row"><span>Subtotal</span><span>{money(totals.subtotal)}</span></div>
+        <div className="invoice-print__totals-row"><span>Tax ({(order.tax_rate * 100).toFixed(0)}%)</span><span>{money(totals.taxAmount)}</span></div>
         {order.discount_amount > 0 && (
-          <div><span>Discount</span><span>-{money(order.discount_amount)}</span></div>
+          <div className="invoice-print__totals-row"><span>{order.discount_label || 'Discount'}</span><span>-{money(order.discount_amount)}</span></div>
         )}
         {order.deposit_amount > 0 && (
-          <div><span>Deposit Paid</span><span>-{money(order.deposit_amount)}</span></div>
+          <div className="invoice-print__totals-row"><span>Deposit Paid</span><span>-{money(order.deposit_amount)}</span></div>
         )}
-        <div className="grand"><span>Amount Due</span><span>{money(totals.amountDue)}</span></div>
+        <div className="invoice-print__totals-row grand"><span>Amount Due</span><span>{money(totals.amountDue)}</span></div>
       </div>
 
-      {order.special_instructions && (
+      {notes && notes.length > 0 && (
         <div className="invoice-print__notes">
-          <strong>Special Instructions:</strong> {order.special_instructions}
+          {notes.map((n) => (
+            <div key={n.id} style={{ marginBottom: 10 }}>
+              <strong>{n.label}:</strong> {n.content}
+            </div>
+          ))}
         </div>
       )}
 

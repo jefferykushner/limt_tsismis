@@ -90,19 +90,40 @@
     margin-left: auto;
     font-size: 0.85rem;
   }
-  .invoice-print__totals div {
+  .invoice-print__totals-row {
     display: flex;
     justify-content: space-between;
     padding: 4px 0;
     border-bottom: 1px solid #eee;
   }
-  .invoice-print__totals .grand {
+  .invoice-print__totals-row.grand {
     font-weight: 700;
     font-size: 1.05rem;
     border-top: 2px solid #201f1c;
     border-bottom: none;
     margin-top: 6px;
     padding-top: 8px;
+  }
+
+  .invoice-print__savings {
+    display: block;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #ccc;
+  }
+  .invoice-print__savings-title {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #777;
+    margin-bottom: 4px;
+  }
+  .invoice-print__savings-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: none;
+    padding: 2px 0;
   }
 
   .invoice-print__notes {
