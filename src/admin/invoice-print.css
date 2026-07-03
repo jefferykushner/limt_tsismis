@@ -28,6 +28,7 @@
     font-family: var(--font-body);
     color: #201f1c;
     background: #fff;
+    line-height: 1.35;
   }
 
   .invoice-print__header {
@@ -83,10 +84,17 @@
 
   .invoice-print table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     margin-bottom: 10px;
     font-size: 0.82rem;
   }
+  .invoice-print table col.col-category { width: 11%; }
+  .invoice-print table col.col-item { width: 13%; }
+  .invoice-print table col.col-details { width: 36%; }
+  .invoice-print table col.col-qty { width: 7%; }
+  .invoice-print table col.col-price { width: 13%; }
+  .invoice-print table col.col-total { width: 20%; }
   .invoice-print th {
     text-align: left;
     border-bottom: 1.5px solid #201f1c;
@@ -118,7 +126,7 @@
   .invoice-print__note {
     font-size: 0.8rem;
     color: #444;
-    line-height: 1.5;
+    line-height: 1.4;
   }
 
   .invoice-print__totals {

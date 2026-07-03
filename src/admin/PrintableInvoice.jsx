@@ -64,6 +64,14 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
 
       {!totalsOnly && productGroups.length > 0 && (
         <table>
+          <colgroup>
+            <col className="col-category" />
+            <col className="col-item" />
+            <col className="col-details" />
+            <col className="col-qty" />
+            <col className="col-price" />
+            <col className="col-total" />
+          </colgroup>
           <thead>
             <tr>
               <th>Category</th>
