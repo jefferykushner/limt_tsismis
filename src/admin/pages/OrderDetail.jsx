@@ -215,21 +215,29 @@ function OrderEditor({ orderId }) {
     }
   }
 
-  const updateLineItem = async (itemId, changes) => {
-    const updated = lineItems.map((li) => {
+  const handleLineItemChange = (itemId, field, value) => {
+    setLineItems((items) => items.map((li) => {
       if (li.id !== itemId) return li
-      const merged = { ...li, ...changes }
-      merged.total_price = Number(merged.quantity || 0) * Number(merged.bill_price || 0)
+      const merged = { ...li, [field]: value }
+      if (field === 'quantity' || field === 'bill_price') {
+        merged.total_price = Number(merged.quantity || 0) * Number(merged.bill_price || 0)
+      }
       return merged
-    })
-    setLineItems(updated)
-    const item = updated.find((li) => li.id === itemId)
+    }))
+  }
+
+  const commitLineItem = async (itemId) => {
+    const item = lineItems.find((li) => li.id === itemId)
+    if (!item) return
     await supabase.from('line_items').update({
+      category: item.category,
+      product_type: item.product_type,
+      details: item.details,
       quantity: item.quantity,
       bill_price: item.bill_price,
       total_price: item.total_price,
     }).eq('id', itemId)
-    persistTotals(updated)
+    persistTotals(lineItems, order)
   }
 
   const deleteLineItem = async (itemId) => {
@@ -359,20 +367,47 @@ function OrderEditor({ orderId }) {
             <tbody>
               {lineItems.map((li) => (
                 <tr key={li.id} style={{ cursor: 'default' }}>
-                  <td>{li.item_type === 'fee' ? 'Fee' : (li.category || '—')}</td>
-                  <td>{li.product_type}</td>
-                  <td>{li.details || '—'}</td>
+                  <td style={{ width: 110 }}>
+                    {li.item_type === 'fee' ? 'Fee' : (
+                      <input
+                        value={li.category || ''}
+                        onChange={(e) => handleLineItemChange(li.id, 'category', e.target.value)}
+                        onBlur={() => commitLineItem(li.id)}
+                        placeholder="Category"
+                        style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
+                      />
+                    )}
+                  </td>
+                  <td style={{ minWidth: 140 }}>
+                    <input
+                      value={li.product_type || ''}
+                      onChange={(e) => handleLineItemChange(li.id, 'product_type', e.target.value)}
+                      onBlur={() => commitLineItem(li.id)}
+                      style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
+                    />
+                  </td>
+                  <td style={{ minWidth: 160 }}>
+                    <input
+                      value={li.details || ''}
+                      onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
+                      onBlur={() => commitLineItem(li.id)}
+                      placeholder="Details"
+                      style={{ width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
+                    />
+                  </td>
                   <td style={{ width: 70 }}>
                     <input
                       type="number" min="0" step="1" value={li.quantity ?? 1}
-                      onChange={(e) => updateLineItem(li.id, { quantity: e.target.value })}
+                      onChange={(e) => handleLineItemChange(li.id, 'quantity', e.target.value)}
+                      onBlur={() => commitLineItem(li.id)}
                       style={{ width: 60, padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
                     />
                   </td>
                   <td style={{ width: 100 }}>
                     <input
                       type="number" min="0" step="0.01" value={li.bill_price ?? 0}
-                      onChange={(e) => updateLineItem(li.id, { bill_price: e.target.value })}
+                      onChange={(e) => handleLineItemChange(li.id, 'bill_price', e.target.value)}
+                      onBlur={() => commitLineItem(li.id)}
                       style={{ width: 90, padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }}
                     />
                   </td>
