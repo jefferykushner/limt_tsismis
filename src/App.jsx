@@ -19,6 +19,7 @@ const Products = lazy(() => import('./admin/pages/Products'))
 
 const AccountLayout = lazy(() => import('./account/AccountLayout'))
 const MyOrders = lazy(() => import('./account/pages/MyOrders'))
+const OrderView = lazy(() => import('./account/pages/OrderView'))
 
 function PublicLayout({ children }) {
   return (
@@ -58,6 +59,7 @@ export default function App() {
               <Route element={<AccountLayout />}>
                 <Route index element={<MyOrders />} />
                 <Route path="orders" element={<MyOrders />} />
+                <Route path="orders/:id" element={<OrderView />} />
               </Route>
             </Route>
           </Routes>

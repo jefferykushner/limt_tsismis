@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabaseClient'
 import { money } from '../../admin/invoiceMath'
 
 export default function MyOrders() {
+  const navigate = useNavigate()
   const { clientRecord } = useAuth()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -54,7 +56,7 @@ export default function MyOrders() {
             </thead>
             <tbody>
               {orders.map((o) => (
-                <tr key={o.id}>
+                <tr key={o.id} onClick={() => navigate(`/account/orders/${o.id}`)}>
                   <td>{o.invoice_number}</td>
                   <td>{o.brand_id === 'limt' ? 'LIMT' : 'Tsismis'}</td>
                   <td>{o.event_date || '—'}</td>

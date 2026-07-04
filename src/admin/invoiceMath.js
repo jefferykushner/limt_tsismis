@@ -68,3 +68,22 @@ export function titleCase(s) {
   if (!s) return s
   return s.replace(/\w\S*/g, (w) => w[0].toUpperCase() + w.slice(1).toLowerCase())
 }
+
+// Groups line items for display: items sharing a group_name are clustered
+// together (used for things like "Personal Charcuterie Boxes" with several
+// dietary variations), everything else renders as an individual row.
+export function groupLineItems(lineItems) {
+  const groupedOrder = []
+  const seenGroups = new Set()
+  lineItems.forEach((li) => {
+    if (li.group_name) {
+      if (!seenGroups.has(li.group_name)) {
+        seenGroups.add(li.group_name)
+        groupedOrder.push({ type: 'group', name: li.group_name, items: lineItems.filter((x) => x.group_name === li.group_name) })
+      }
+    } else {
+      groupedOrder.push({ type: 'single', item: li })
+    }
+  })
+  return groupedOrder
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { calcTotals, calcWaivedBreakdown, feesOnly, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
+import { calcTotals, calcWaivedBreakdown, feesOnly, groupLineItems, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
 import PrintableInvoice from '../PrintableInvoice'
 
 const FEE_PRESETS = ['Setup Fee', 'Delivery Fee', 'Service Fee', 'Rush Fee']
@@ -310,20 +310,7 @@ function OrderEditor({ orderId }) {
 
   if (loading || !order) return <div className="dash-empty">Loading invoice…</div>
 
-  // Group line items for display: grouped rows are clustered under a shared
-  // header with a rollup, ungrouped rows render individually as before.
-  const groupedOrder = []
-  const seenGroups = new Set()
-  lineItems.forEach((li) => {
-    if (li.group_name) {
-      if (!seenGroups.has(li.group_name)) {
-        seenGroups.add(li.group_name)
-        groupedOrder.push({ type: 'group', name: li.group_name, items: lineItems.filter((x) => x.group_name === li.group_name) })
-      }
-    } else {
-      groupedOrder.push({ type: 'single', item: li })
-    }
-  })
+  const groupedOrder = groupLineItems(lineItems)
 
   const renderEditableRow = (li) => (
     <tr key={li.id} style={{ cursor: 'default' }}>
