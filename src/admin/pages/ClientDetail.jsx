@@ -6,7 +6,7 @@ import { initialsOf } from '../../lib/nameUtils'
 
 const emptyClient = {
   name: '', phone: '', email: '',
-  client_type: 'person', company_name: '', contact_person: '',
+  client_type: 'person', contact_person: '',
   secondary_contact_name: '', secondary_contact_phone: '', secondary_contact_email: '',
   billing_address_line1: '', billing_city: '', billing_province: '', billing_postal_code: '',
   notes: '', user_id: null,
@@ -118,7 +118,7 @@ export default function ClientDetail() {
 
           <div className="dash-form-grid">
             <label className="dash-field">
-              <span>Name</span>
+              <span>{client.client_type === 'business' ? 'Business Name' : 'Full Name'}</span>
               <input value={client.name || ''} onChange={(e) => setClient({ ...client, name: e.target.value })} required />
             </label>
             <label className="dash-field">
@@ -133,13 +133,9 @@ export default function ClientDetail() {
               <span>City</span>
               <input value={client.billing_city || ''} onChange={(e) => setClient({ ...client, billing_city: e.target.value })} />
             </label>
-            <label className="dash-field">
-              <span>Company Name</span>
-              <input value={client.company_name || ''} onChange={(e) => setClient({ ...client, company_name: e.target.value })} placeholder="Optional" />
-            </label>
-            <label className="dash-field">
+            <label className="dash-field span-2">
               <span>Contact Person</span>
-              <input value={client.contact_person || ''} onChange={(e) => setClient({ ...client, contact_person: e.target.value })} placeholder="Optional" />
+              <input value={client.contact_person || ''} onChange={(e) => setClient({ ...client, contact_person: e.target.value })} placeholder="Optional — the individual to address at this client" />
             </label>
             <label className="dash-field span-2">
               <span>Billing Address</span>

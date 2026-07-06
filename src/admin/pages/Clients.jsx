@@ -15,7 +15,7 @@ export default function Clients() {
     setLoading(true)
     const { data, error } = await supabase
       .from('clients')
-      .select('id, name, phone, email, billing_city, user_id, client_type, company_name, contact_person')
+      .select('id, name, phone, email, billing_city, user_id, client_type, contact_person')
       .is('deleted_at', null)
       .order('name', { ascending: true })
     if (!error) setClients(data)
