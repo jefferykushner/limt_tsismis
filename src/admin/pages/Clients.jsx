@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-
-function initialsOf(name) {
-  return name.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
-}
+import { initialsOf } from '../../lib/nameUtils'
 
 export default function Clients() {
   const navigate = useNavigate()
@@ -18,7 +15,7 @@ export default function Clients() {
     setLoading(true)
     const { data, error } = await supabase
       .from('clients')
-      .select('id, name, phone, email, billing_city, user_id')
+      .select('id, name, phone, email, billing_city, user_id, client_type, company_name, contact_person')
       .is('deleted_at', null)
       .order('name', { ascending: true })
     if (!error) setClients(data)
@@ -77,7 +74,9 @@ export default function Clients() {
                 <div className="dash-avatar dash-avatar--neutral">{initialsOf(c.name)}</div>
                 <div>
                   <div className="profile-card-name">{c.name}</div>
-                  <div className="profile-card-sub">{c.billing_city || 'No city on file'}</div>
+                  <div className="profile-card-sub">
+                    {c.contact_person ? `Attn: ${c.contact_person}` : (c.billing_city || 'No city on file')}
+                  </div>
                 </div>
               </div>
               <div className="profile-card-meta">
@@ -85,6 +84,12 @@ export default function Clients() {
                 <span>{c.email || '—'}</span>
               </div>
               <div className="chip-row">
+                {c.client_type === 'business' && (
+                  <span className="chip">
+                    <span className="chip-icon chip-icon--ube">B</span>
+                    Business
+                  </span>
+                )}
                 <span className="chip">
                   <span className={`chip-icon ${c.user_id ? 'chip-icon--blush' : 'chip-icon--graphite'}`}>
                     {c.user_id ? '✓' : '–'}

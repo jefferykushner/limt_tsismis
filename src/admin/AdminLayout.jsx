@@ -1,10 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { initialsOf } from '../lib/nameUtils'
 import '../styles/dashboard.css'
 
 export default function AdminLayout() {
-  const { user, signOut } = useAuth()
-  const initials = (user?.email || '?').slice(0, 2).toUpperCase()
+  const { user, staffName, signOut } = useAuth()
+  const initials = staffName
+    ? initialsOf(staffName)
+    : (user?.email || '?').slice(0, 2).toUpperCase()
 
   return (
     <div className="dash">
@@ -16,9 +19,9 @@ export default function AdminLayout() {
 
         <div className="dash-identity">
           <div className="dash-avatar dash-avatar--neutral">{initials}</div>
-          <div>
-            <div className="dash-identity-name">{user?.email}</div>
-            <div className="dash-identity-role">Admin</div>
+          <div className="dash-identity-text">
+            {staffName && <div className="dash-identity-name">{staffName}</div>}
+            <div className="dash-identity-email">{user?.email}</div>
           </div>
         </div>
 

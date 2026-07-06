@@ -6,22 +6,25 @@ const AuthContext = createContext(undefined)
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [staffName, setStaffName] = useState(null)
   const [clientRecord, setClientRecord] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const loadRole = async (session) => {
     if (!session) {
       setIsAdmin(false)
+      setStaffName(null)
       setClientRecord(null)
       return
     }
 
     const [{ data: staffRow }, { data: clientRow }] = await Promise.all([
-      supabase.from('staff').select('user_id').eq('user_id', session.user.id).maybeSingle(),
+      supabase.from('staff').select('user_id, name').eq('user_id', session.user.id).maybeSingle(),
       supabase.from('clients').select('*').eq('user_id', session.user.id).maybeSingle(),
     ])
 
     setIsAdmin(!!staffRow)
+    setStaffName(staffRow?.name || null)
     setClientRecord(clientRow || null)
   }
 
@@ -49,6 +52,7 @@ export function AuthProvider({ children }) {
     session,
     user: session?.user ?? null,
     isAdmin,
+    staffName,
     clientRecord,
     loading,
     signIn,

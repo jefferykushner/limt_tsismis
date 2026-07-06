@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { money } from '../invoiceMath'
+import { initialsOf } from '../../lib/nameUtils'
 
 const emptyClient = {
   name: '', phone: '', email: '',
+  client_type: 'person', company_name: '', contact_person: '',
+  secondary_contact_name: '', secondary_contact_phone: '', secondary_contact_email: '',
   billing_address_line1: '', billing_city: '', billing_province: '', billing_postal_code: '',
   notes: '', user_id: null,
-}
-
-function initialsOf(name) {
-  return (name || '?').split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
 }
 
 export default function ClientDetail() {
@@ -103,6 +102,20 @@ export default function ClientDetail() {
         </div>
 
         <form onSubmit={handleSave}>
+          <div className="dash-field" style={{ marginBottom: 18 }}>
+            <span>Client Type</span>
+            <div style={{ display: 'flex', gap: 20, marginTop: 4 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', textTransform: 'none', fontWeight: 400, color: 'var(--ink)' }}>
+                <input type="radio" name="client_type" checked={client.client_type === 'person'} onChange={() => setClient({ ...client, client_type: 'person' })} />
+                Person
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', textTransform: 'none', fontWeight: 400, color: 'var(--ink)' }}>
+                <input type="radio" name="client_type" checked={client.client_type === 'business'} onChange={() => setClient({ ...client, client_type: 'business' })} />
+                Business
+              </label>
+            </div>
+          </div>
+
           <div className="dash-form-grid">
             <label className="dash-field">
               <span>Name</span>
@@ -120,6 +133,14 @@ export default function ClientDetail() {
               <span>City</span>
               <input value={client.billing_city || ''} onChange={(e) => setClient({ ...client, billing_city: e.target.value })} />
             </label>
+            <label className="dash-field">
+              <span>Company Name</span>
+              <input value={client.company_name || ''} onChange={(e) => setClient({ ...client, company_name: e.target.value })} placeholder="Optional" />
+            </label>
+            <label className="dash-field">
+              <span>Contact Person</span>
+              <input value={client.contact_person || ''} onChange={(e) => setClient({ ...client, contact_person: e.target.value })} placeholder="Optional" />
+            </label>
             <label className="dash-field span-2">
               <span>Billing Address</span>
               <input value={client.billing_address_line1 || ''} onChange={(e) => setClient({ ...client, billing_address_line1: e.target.value })} />
@@ -129,6 +150,27 @@ export default function ClientDetail() {
               <textarea rows={3} value={client.notes || ''} onChange={(e) => setClient({ ...client, notes: e.target.value })} />
             </label>
           </div>
+
+          {client.client_type === 'business' && (
+            <div style={{ marginTop: 18, padding: 16, background: 'var(--cream)', borderRadius: 8 }}>
+              <div className="dash-section-label" style={{ marginBottom: 12 }}>Secondary Contact (Optional)</div>
+              <div className="dash-form-grid">
+                <label className="dash-field">
+                  <span>Name</span>
+                  <input value={client.secondary_contact_name || ''} onChange={(e) => setClient({ ...client, secondary_contact_name: e.target.value })} />
+                </label>
+                <label className="dash-field">
+                  <span>Phone</span>
+                  <input value={client.secondary_contact_phone || ''} onChange={(e) => setClient({ ...client, secondary_contact_phone: e.target.value })} />
+                </label>
+                <label className="dash-field">
+                  <span>Email</span>
+                  <input type="email" value={client.secondary_contact_email || ''} onChange={(e) => setClient({ ...client, secondary_contact_email: e.target.value })} />
+                </label>
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 18 }}>
             <button className="dash-btn" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save Changes'}</button>
             {saved && <span className="dash-saved">Saved</span>}

@@ -314,7 +314,7 @@ function OrderEditor({ orderId }) {
 
   const renderEditableRow = (li) => (
     <tr key={li.id} style={{ cursor: 'default' }}>
-      <td style={{ width: 100 }}>
+      <td style={{ width: 90 }}>
         {li.item_type === 'fee' ? 'Fee' : (
           <input
             value={li.category || ''}
@@ -325,7 +325,7 @@ function OrderEditor({ orderId }) {
           />
         )}
       </td>
-      <td style={{ minWidth: 130 }}>
+      <td style={{ minWidth: 180 }}>
         <input
           value={li.product_type || ''}
           onChange={(e) => handleLineItemChange(li.id, 'product_type', e.target.value)}
@@ -333,7 +333,7 @@ function OrderEditor({ orderId }) {
           style={cellInputStyle}
         />
       </td>
-      <td style={{ minWidth: 140 }}>
+      <td style={{ minWidth: 340 }}>
         <input
           value={li.details || ''}
           onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
@@ -342,43 +342,43 @@ function OrderEditor({ orderId }) {
           style={cellInputStyle}
         />
       </td>
-      <td style={{ width: 55 }}>
+      <td style={{ width: 65 }}>
         <input
           type="number" min="0" step="1" value={li.quantity ?? 1}
           onChange={(e) => handleLineItemChange(li.id, 'quantity', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
-          style={{ ...cellInputStyle, width: 50 }}
+          style={{ ...cellInputStyle, width: 58 }}
         />
       </td>
-      <td style={{ width: 80 }} title={li.item_type === 'fee' ? "Regular fee amount, before any waiver" : "Regular price per unit, before any waiver"}>
+      <td style={{ width: 95 }} title={li.item_type === 'fee' ? "Regular fee amount, before any waiver" : "Regular price per unit, before any waiver"}>
         <input
           type="number" min="0" step="0.01" value={li.item_price ?? ''}
           onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
           placeholder="—"
-          style={{ ...cellInputStyle, width: 74 }}
+          style={{ ...cellInputStyle, width: 88 }}
         />
       </td>
-      <td style={{ width: 80 }} title="Additional per-unit cost, e.g. a customization surcharge (products only)">
+      <td style={{ width: 95 }} title="Additional per-unit cost, e.g. a customization surcharge (products only)">
         {li.item_type === 'fee' ? '—' : (
           <input
             type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
             onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
             onBlur={() => commitLineItem(li.id)}
             placeholder="—"
-            style={{ ...cellInputStyle, width: 74 }}
+            style={{ ...cellInputStyle, width: 88 }}
           />
         )}
       </td>
-      <td style={{ width: 85 }} title="What's actually billed per unit">
+      <td style={{ width: 100 }} title="What's actually billed per unit">
         <input
           type="number" min="0" step="0.01" value={li.bill_price ?? 0}
           onChange={(e) => handleLineItemChange(li.id, 'bill_price', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
-          style={{ ...cellInputStyle, width: 78 }}
+          style={{ ...cellInputStyle, width: 92 }}
         />
       </td>
-      <td>
+      <td style={{ whiteSpace: 'nowrap' }}>
         {lineItemWaivedAmount(li) > 0 && (
           <span style={{ textDecoration: 'line-through', color: 'var(--graphite)', marginRight: 6, fontSize: '0.82rem' }}>
             {money(lineItemListTotal(li))}
@@ -497,7 +497,8 @@ function OrderEditor({ orderId }) {
         <div className="dash-section-label" style={{ marginBottom: 14 }}>Line Items</div>
 
         {lineItems.length > 0 && (
-          <table className="dash-table" style={{ marginBottom: 18 }}>
+          <div style={{ overflowX: 'auto', marginBottom: 18 }}>
+          <table className="dash-table" style={{ marginBottom: 0, minWidth: 1050 }}>
             <thead>
               <tr>
                 <th>Type</th><th>Item</th><th>Details</th><th>Qty</th>
@@ -532,6 +533,7 @@ function OrderEditor({ orderId }) {
               })}
             </tbody>
           </table>
+          </div>
         )}
 
         <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
@@ -563,8 +565,8 @@ function OrderEditor({ orderId }) {
             <input placeholder="Category" value={manualItem.category} onChange={(e) => setManualItem({ ...manualItem, category: e.target.value })} style={{ maxWidth: 120 }} />
           </div>
           <div className="dash-inline-form" style={{ marginBottom: 0 }}>
-            <input placeholder="Item / variation name" value={manualItem.product_type} onChange={(e) => setManualItem({ ...manualItem, product_type: e.target.value })} required />
-            <input placeholder="Details" value={manualItem.details} onChange={(e) => setManualItem({ ...manualItem, details: e.target.value })} />
+            <input placeholder="Item / variation name" value={manualItem.product_type} onChange={(e) => setManualItem({ ...manualItem, product_type: e.target.value })} required style={{ flex: 2, minWidth: 220 }} />
+            <input placeholder="Details" value={manualItem.details} onChange={(e) => setManualItem({ ...manualItem, details: e.target.value })} style={{ flex: 3, minWidth: 260 }} />
             <input type="number" min="0" placeholder="Qty" value={manualItem.quantity} onChange={(e) => setManualItem({ ...manualItem, quantity: e.target.value })} style={{ maxWidth: 65 }} />
             <input type="number" min="0" step="0.01" placeholder="Reg. price" value={manualItem.item_price} onChange={(e) => setManualItem({ ...manualItem, item_price: e.target.value })} style={{ maxWidth: 95 }} title="Optional: the regular price, if different from what's billed" />
             <input type="number" min="0" step="0.01" placeholder="Add'l" value={manualItem.addl_cost} onChange={(e) => setManualItem({ ...manualItem, addl_cost: e.target.value })} style={{ maxWidth: 80 }} title="Optional: additional per-unit cost" />

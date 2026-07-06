@@ -63,7 +63,7 @@
 
 .dash-identity {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 8px 18px;
   margin-bottom: 8px;
@@ -86,8 +86,9 @@
 .dash-avatar--tsismis { background: var(--ube); }
 .dash-avatar--neutral { background: var(--graphite); }
 
-.dash-identity-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
-.dash-identity-role { font-size: 0.72rem; color: var(--graphite); text-transform: uppercase; letter-spacing: 0.05em; }
+.dash-identity-text { min-width: 0; flex: 1; }
+.dash-identity-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); overflow-wrap: break-word; line-height: 1.3; }
+.dash-identity-email { font-size: 0.72rem; font-weight: 400; color: var(--graphite); overflow-wrap: break-word; line-height: 1.3; margin-top: 2px; }
 
 .dash-nav {
   display: flex;
