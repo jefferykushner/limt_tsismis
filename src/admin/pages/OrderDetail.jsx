@@ -100,7 +100,6 @@ function NewOrderSetup() {
 }
 
 const inputStyle = { padding: '9px 12px', border: '1px solid var(--fog)', borderRadius: 8, fontFamily: 'var(--font-body)', fontSize: '0.9rem', textTransform: 'none' }
-const cellInputStyle = { width: '100%', padding: '4px 6px', border: '1px solid var(--fog)', borderRadius: 6 }
 
 /* ── Step 2: the real editor, once an order row exists ── */
 function OrderEditor({ orderId }) {
@@ -313,85 +312,77 @@ function OrderEditor({ orderId }) {
   const groupedOrder = groupLineItems(lineItems)
 
   const renderEditableRow = (li) => (
-    <tr key={li.id} style={{ cursor: 'default' }}>
-      <td style={{ width: 90 }}>
-        {li.item_type === 'fee' ? 'Fee' : (
-          <input
-            value={li.category || ''}
-            onChange={(e) => handleLineItemChange(li.id, 'category', e.target.value)}
-            onBlur={() => commitLineItem(li.id)}
-            placeholder="Category"
-            style={cellInputStyle}
-          />
-        )}
-      </td>
-      <td style={{ minWidth: 180 }}>
+    <div className="li-row" key={li.id}>
+      <div className="li-grid">
+        <div>
+          {li.item_type === 'fee' ? (
+            <div className="li-static">Fee</div>
+          ) : (
+            <input
+              value={li.category || ''}
+              onChange={(e) => handleLineItemChange(li.id, 'category', e.target.value)}
+              onBlur={() => commitLineItem(li.id)}
+              placeholder="Category"
+            />
+          )}
+        </div>
         <input
           value={li.product_type || ''}
           onChange={(e) => handleLineItemChange(li.id, 'product_type', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
-          style={cellInputStyle}
+          placeholder="Item name"
         />
-      </td>
-      <td style={{ minWidth: 340 }}>
-        <input
-          value={li.details || ''}
-          onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
-          onBlur={() => commitLineItem(li.id)}
-          placeholder="Details"
-          style={cellInputStyle}
-        />
-      </td>
-      <td style={{ width: 65 }}>
         <input
           type="number" min="0" step="1" value={li.quantity ?? 1}
           onChange={(e) => handleLineItemChange(li.id, 'quantity', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
-          style={{ ...cellInputStyle, width: 58 }}
         />
-      </td>
-      <td style={{ width: 95 }} title={li.item_type === 'fee' ? "Regular fee amount, before any waiver" : "Regular price per unit, before any waiver"}>
         <input
           type="number" min="0" step="0.01" value={li.item_price ?? ''}
           onChange={(e) => handleLineItemChange(li.id, 'item_price', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
           placeholder="—"
-          style={{ ...cellInputStyle, width: 88 }}
+          title={li.item_type === 'fee' ? "Regular fee amount, before any waiver" : "Regular price per unit, before any waiver"}
         />
-      </td>
-      <td style={{ width: 95 }} title="Additional per-unit cost, e.g. a customization surcharge (products only)">
-        {li.item_type === 'fee' ? '—' : (
-          <input
-            type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
-            onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
-            onBlur={() => commitLineItem(li.id)}
-            placeholder="—"
-            style={{ ...cellInputStyle, width: 88 }}
-          />
-        )}
-      </td>
-      <td style={{ width: 100 }} title="What's actually billed per unit">
+        <div>
+          {li.item_type === 'fee' ? (
+            <div className="li-static">—</div>
+          ) : (
+            <input
+              type="number" min="0" step="0.01" value={li.addl_cost ?? ''}
+              onChange={(e) => handleLineItemChange(li.id, 'addl_cost', e.target.value)}
+              onBlur={() => commitLineItem(li.id)}
+              placeholder="—"
+              title="Additional per-unit cost, e.g. a customization surcharge (products only)"
+            />
+          )}
+        </div>
         <input
           type="number" min="0" step="0.01" value={li.bill_price ?? 0}
           onChange={(e) => handleLineItemChange(li.id, 'bill_price', e.target.value)}
           onBlur={() => commitLineItem(li.id)}
-          style={{ ...cellInputStyle, width: 92 }}
+          title="What's actually billed per unit"
         />
-      </td>
-      <td style={{ whiteSpace: 'nowrap' }}>
-        {lineItemWaivedAmount(li) > 0 && (
-          <span style={{ textDecoration: 'line-through', color: 'var(--graphite)', marginRight: 6, fontSize: '0.82rem' }}>
-            {money(lineItemListTotal(li))}
-          </span>
-        )}
-        {money(li.total_price)}
-      </td>
-      <td>
-        <button className="dash-btn--ghost dash-btn" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => deleteLineItem(li.id)}>
+        <div className="li-total" title="Total">
+          {lineItemWaivedAmount(li) > 0 && (
+            <span style={{ textDecoration: 'line-through', color: 'var(--graphite)', marginRight: 6, fontSize: '0.8rem' }}>
+              {money(lineItemListTotal(li))}
+            </span>
+          )}
+          {money(li.total_price)}
+        </div>
+        <button className="dash-btn--ghost dash-btn li-remove" onClick={() => deleteLineItem(li.id)}>
           Remove
         </button>
-      </td>
-    </tr>
+      </div>
+      <input
+        className="li-details"
+        value={li.details || ''}
+        onChange={(e) => handleLineItemChange(li.id, 'details', e.target.value)}
+        onBlur={() => commitLineItem(li.id)}
+        placeholder="Details / notes for this item"
+      />
+    </div>
   )
 
   return (
@@ -497,42 +488,34 @@ function OrderEditor({ orderId }) {
         <div className="dash-section-label" style={{ marginBottom: 14 }}>Line Items</div>
 
         {lineItems.length > 0 && (
-          <div style={{ overflowX: 'auto', marginBottom: 18 }}>
-          <table className="dash-table" style={{ marginBottom: 0, minWidth: 1050 }}>
-            <thead>
-              <tr>
-                <th>Type</th><th>Item</th><th>Details</th><th>Qty</th>
-                <th title="Regular price per unit">Reg. Price</th>
-                <th title="Additional per-unit cost">Add'l</th>
-                <th title="What's actually billed per unit">Bill Price</th>
-                <th>Total</th><th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {groupedOrder.map((entry, idx) => {
-                if (entry.type === 'single') return renderEditableRow(entry.item)
-                const groupTotal = entry.items.reduce((s, i) => s + Number(i.total_price || 0), 0)
-                const groupQty = entry.items.reduce((s, i) => s + Number(i.quantity || 0), 0)
-                return (
-                  <Fragment key={`group-${entry.name}-${idx}`}>
-                    <tr>
-                      <td colSpan={9} style={{ background: 'var(--cream)', fontWeight: 600, fontSize: '0.8rem' }}>
-                        {entry.name}
-                      </td>
-                    </tr>
-                    {entry.items.map(renderEditableRow)}
-                    <tr style={{ fontWeight: 600 }}>
-                      <td colSpan={3}>TOTAL {entry.name.toUpperCase()}</td>
-                      <td>{groupQty}</td>
-                      <td></td><td></td><td></td>
-                      <td>{money(groupTotal)}</td>
-                      <td></td>
-                    </tr>
-                  </Fragment>
-                )
-              })}
-            </tbody>
-          </table>
+          <div className="li-list">
+            <div className="li-grid li-grid-header">
+              <div>Type</div>
+              <div>Item</div>
+              <div>Qty</div>
+              <div title="Regular price per unit">Reg. Price</div>
+              <div title="Additional per-unit cost">Add'l</div>
+              <div title="What's actually billed per unit">Bill Price</div>
+              <div>Total</div>
+              <div></div>
+            </div>
+
+            {groupedOrder.map((entry, idx) => {
+              if (entry.type === 'single') return renderEditableRow(entry.item)
+              const groupTotal = entry.items.reduce((s, i) => s + Number(i.total_price || 0), 0)
+              const groupQty = entry.items.reduce((s, i) => s + Number(i.quantity || 0), 0)
+              return (
+                <Fragment key={`group-${entry.name}-${idx}`}>
+                  <div className="li-group-header">{entry.name}</div>
+                  {entry.items.map(renderEditableRow)}
+                  <div className="li-group-total">
+                    <span>TOTAL {entry.name.toUpperCase()}</span>
+                    <span>{groupQty} items</span>
+                    <span>{money(groupTotal)}</span>
+                  </div>
+                </Fragment>
+              )
+            })}
           </div>
         )}
 

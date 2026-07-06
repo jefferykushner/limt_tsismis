@@ -267,6 +267,120 @@
 
 /* ---------- Tables ---------- */
 
+/* ---------- Line item editor (grid-aligned cards, no horizontal scroll) ---------- */
+
+.li-list {
+  border: 1px solid var(--fog);
+  border-radius: var(--dash-radius);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.li-grid {
+  display: grid;
+  grid-template-columns: 80px minmax(140px, 1.2fr) 52px 76px 76px 82px 140px 70px;
+  gap: 10px;
+  align-items: center;
+}
+
+.li-grid-header {
+  padding: 10px 14px;
+  background: #FAFAF8;
+  border-bottom: 1px solid var(--fog);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--graphite);
+  font-weight: 600;
+}
+
+.li-row {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--fog);
+  background: var(--white);
+}
+.li-row:last-child { border-bottom: none; }
+
+.li-row input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--fog);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.li-row input:focus {
+  outline: none;
+  border-color: var(--blush);
+  box-shadow: 0 0 0 3px var(--blush-lt);
+}
+
+.li-static {
+  font-size: 0.82rem;
+  color: var(--graphite);
+  padding: 7px 0;
+}
+
+.li-total {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+}
+
+.li-remove {
+  padding: 6px 10px !important;
+  font-size: 0.74rem !important;
+  white-space: nowrap;
+}
+
+.li-details {
+  margin-top: 8px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--fog);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--ink-lt);
+  background: var(--white);
+}
+.li-details:focus {
+  outline: none;
+  border-color: var(--blush);
+  box-shadow: 0 0 0 3px var(--blush-lt);
+}
+.li-details::placeholder { color: var(--graphite); opacity: 0.7; }
+
+.li-group-header {
+  padding: 10px 14px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--fog);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.li-group-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--fog);
+  background: #FAFAF8;
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+.li-group-total span:nth-child(2) { margin-right: auto; margin-left: 24px; color: var(--graphite); font-weight: 500; }
+
+/* Below a comfortable desktop width, let the short fields wrap onto two
+   lines within the row rather than compressing illegibly or scrolling. */
+@media (max-width: 880px) {
+  .li-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .li-grid-header { display: none; }
+}
+
 .dash-table {
   width: 100%;
   border-collapse: collapse;
