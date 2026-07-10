@@ -1,13 +1,15 @@
 import { Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { money, lineItemListTotal, lineItemWaivedAmount, feesOnly, titleCase } from './invoiceMath'
-import limtLogoFull from '../assets/limt-logo-full.png'
-import tsismisLogoFull from '../assets/tsismis-logo-full.png'
+import limtWordmark from '../assets/limt-logo-wordmark.png'
+import limtMascot from '../assets/limt-logo-mascot.png'
+import tsismisWordmark from '../assets/tsismis-logo-wordmark.png'
+import tsismisMascot from '../assets/tsismis-logo-mascot.png'
 import './invoice-print.css'
 
 const BRAND_INFO = {
-  limt: { name: 'Love in My Tummy', tagline: 'Made with care. Delivered with love.', logo: limtLogoFull },
-  tsismis: { name: 'Tsismis', tagline: "You didn't hear this from me.", logo: tsismisLogoFull },
+  limt: { name: 'Love in My Tummy', tagline: 'Made with care. Delivered with love.', wordmark: limtWordmark, mascot: limtMascot },
+  tsismis: { name: 'Tsismis', tagline: "You didn't hear this from me.", wordmark: tsismisWordmark, mascot: tsismisMascot },
 }
 
 export default function PrintableInvoice({ order, client, lineItems, totals, notes, waivedBreakdown, groupedOrder }) {
@@ -23,8 +25,8 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
     <div className="invoice-print">
       <div className="invoice-print__header">
         <div>
-          {brand.logo ? (
-            <img src={brand.logo} alt={brand.name} className="invoice-print__logo" />
+          {brand.wordmark ? (
+            <img src={brand.wordmark} alt={brand.name} className="invoice-print__wordmark" />
           ) : (
             <>
               <div className="invoice-print__brand">{brand.name}</div>
@@ -144,6 +146,9 @@ export default function PrintableInvoice({ order, client, lineItems, totals, not
       )}
 
       <div className="invoice-print__bottom-row">
+        {brand.mascot && (
+          <img src={brand.mascot} alt="" className="invoice-print__mascot" />
+        )}
         <div className="invoice-print__notes-box">
           {notes && notes.length > 0 && notes.map((n) => (
             <div key={n.id} className="invoice-print__note">

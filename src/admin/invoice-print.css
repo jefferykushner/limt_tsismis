@@ -43,9 +43,9 @@
     font-family: var(--font-display);
     font-size: 1.4rem;
   }
-  .invoice-print__logo {
-    max-height: 155px;
-    max-width: 340px;
+  .invoice-print__wordmark {
+    max-height: 76px;
+    max-width: 320px;
     object-fit: contain;
     display: block;
   }
@@ -111,8 +111,16 @@
   .invoice-print__bottom-row {
     display: flex;
     align-items: flex-start;
-    gap: 28px;
+    gap: 20px;
     margin-top: 20px;
+  }
+
+  .invoice-print__mascot {
+    width: 72px;
+    height: auto;
+    flex-shrink: 0;
+    align-self: flex-end;
+    opacity: 0.92;
   }
 
   .invoice-print__notes-box {
