@@ -2,6 +2,7 @@ import { useEffect, useState, Fragment } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { calcTotals, calcWaivedBreakdown, feesOnly, groupLineItems, lineItemListTotal, lineItemWaivedAmount, money } from '../invoiceMath'
+import { usePrintPreview } from '../usePrintPreview'
 import PrintableInvoice from '../PrintableInvoice'
 
 const FEE_PRESETS = ['Setup Fee', 'Delivery Fee', 'Service Fee', 'Rush Fee']
@@ -104,6 +105,7 @@ const inputStyle = { padding: '9px 12px', border: '1px solid var(--fog)', border
 /* ── Step 2: the real editor, once an order row exists ── */
 function OrderEditor({ orderId }) {
   const navigate = useNavigate()
+  const { isPreviewOpen, openPreview, closePreview } = usePrintPreview()
   const [order, setOrder] = useState(null)
   const [client, setClient] = useState(null)
   const [lineItems, setLineItems] = useState([])
@@ -421,6 +423,7 @@ function OrderEditor({ orderId }) {
             />
             Totals only
           </label>
+          <button className="dash-btn dash-btn--ghost" onClick={openPreview}>Preview</button>
           <button className="dash-btn dash-btn--ghost" onClick={() => window.print()}>Print / Save PDF</button>
           <button className="dash-btn dash-btn--danger" onClick={handleDeleteOrder}>Delete Invoice</button>
         </div>
@@ -700,6 +703,12 @@ function OrderEditor({ orderId }) {
         </div>
       </div>
 
+      {isPreviewOpen && (
+        <>
+          <div className="invoice-preview-hint">Invoice Preview</div>
+          <button className="invoice-preview-close" onClick={closePreview} aria-label="Close preview">✕</button>
+        </>
+      )}
       <PrintableInvoice order={order} client={client} lineItems={lineItems} totals={totals} notes={notes} waivedBreakdown={waivedBreakdown} totalWaived={totalWaived} groupedOrder={groupedOrder} />
     </div>
   )

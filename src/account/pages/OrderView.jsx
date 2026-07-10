@@ -4,8 +4,10 @@ import { useAuth } from '../../context/AuthContext'
 import { supabase } from '../../lib/supabaseClient'
 import { calcTotals, calcWaivedBreakdown, groupLineItems, lineItemListTotal, lineItemWaivedAmount, money } from '../../admin/invoiceMath'
 import PrintableInvoice from '../../admin/PrintableInvoice'
+import { usePrintPreview } from '../../admin/usePrintPreview'
 
 export default function OrderView() {
+  const { isPreviewOpen, openPreview, closePreview } = usePrintPreview()
   const { id } = useParams()
   const { clientRecord } = useAuth()
   const [order, setOrder] = useState(null)
@@ -65,7 +67,10 @@ export default function OrderView() {
           <span className="dash-kicker">{order.brand_id === 'limt' ? 'LIMT' : 'Tsismis'} Invoice</span>
           <h1 className="dash-title">{order.invoice_number}</h1>
         </div>
-        <button className="dash-btn" onClick={() => window.print()}>Print / Save PDF</button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className="dash-btn dash-btn--ghost" onClick={openPreview}>Preview</button>
+          <button className="dash-btn" onClick={() => window.print()}>Print / Save PDF</button>
+        </div>
       </div>
 
       <div className="dash-card no-print" style={{ marginBottom: 20 }}>
@@ -157,6 +162,12 @@ export default function OrderView() {
         </div>
       </div>
 
+      {isPreviewOpen && (
+        <>
+          <div className="invoice-preview-hint">Invoice Preview</div>
+          <button className="invoice-preview-close" onClick={closePreview} aria-label="Close preview">✕</button>
+        </>
+      )}
       <PrintableInvoice
         order={order}
         client={clientRecord}
