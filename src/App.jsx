@@ -6,13 +6,14 @@ import { AdminRoute, CustomerRoute } from './routes/RoleRoutes'
 import Nav from './components/Nav'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
+import TsismisHomePage from './pages/TsismisHomePage'
 import MenuPage from './pages/MenuPage'
 import Login from './pages/Login'
 
-// Brand theme tokens — both load, [data-brand] on <html> decides which
-// set of CSS variables is actually active at any given time.
-import './brand/limt.theme.css'
-import './brand/tsismis.theme.css'
+// LG's shared circle-breakout mechanic. The earlier [data-brand]-scoped
+// limt.theme.css / tsismis.theme.css files have been retired — delete them
+// from /src/brand, they duplicated the real tokens.css system and were
+// never actually referenced anywhere else in the app.
 import './components/lg-mascot.css'
 
 // Admin and account sections are lazy-loaded so their code never
@@ -50,17 +51,18 @@ export default function App() {
         <BrandProvider>
           <Suspense fallback={<div className="auth-loading">Loading…</div>}>
             <Routes>
-              {/* Public marketing site — UNCHANGED from your current routes.
-                  Right now these resolve to data-brand="limt" by default,
-                  since neither path starts with /tsismis. */}
+              {/* LIMT — the default public experience */}
               <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
               <Route path="/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
-              <Route path="/login" element={<Login />} />
 
-              {/* Tsismis public routes go here once those pages exist —
-                  e.g. <Route path="/tsismis" element={<PublicLayout><TsismisHomePage /></PublicLayout>} />
-                  Left out rather than guessed, since those components
-                  aren't in your repo yet. */}
+              {/* Tsismis — its own distinct shell, same MenuPage component
+                  (it reads the active brand from BrandContext, which
+                  resolves from the /tsismis prefix, so no separate menu
+                  component is needed here). */}
+              <Route path="/tsismis" element={<PublicLayout><TsismisHomePage /></PublicLayout>} />
+              <Route path="/tsismis/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
+
+              <Route path="/login" element={<Login />} />
 
               {/* Admin back office — unchanged */}
               <Route path="/admin" element={<AdminRoute />}>
