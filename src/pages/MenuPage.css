@@ -257,3 +257,23 @@
   .menu-main { padding: 0 16px 60px; }
   .menu-cta  { padding: 28px 20px; }
 }
+
+.menu-header__name {
+  font-family: var(--font-editorial);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.menu-header__name--limt    { color: var(--blush); }
+.menu-header__name--tsismis { color: var(--ube); }
+
+.menu-item__img {
+  grid-column: 1 / -1;
+  grid-row: 0;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
