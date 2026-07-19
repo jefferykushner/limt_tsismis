@@ -1,0 +1,18 @@
+/* Tsismis theme tokens — confirmed brand palette. */
+[data-brand='tsismis'] {
+  --color-bg: #ffffff;
+  --color-surface: #d4d0c7; /* Fog */
+  --color-primary: #6e4a8c; /* Ube */
+  --color-primary-strong: #58386f;
+  --color-accent: #c49b95; /* Blush */
+  --color-text: #2b2b2b; /* near-black for body copy — Graphite reserved for secondary text */
+  --color-text-muted: #707070; /* Graphite */
+  --color-border: #d4d0c7; /* Fog */
+
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Cormorant Garamond', serif;
+
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+}

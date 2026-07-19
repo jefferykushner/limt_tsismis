@@ -1,0 +1,23 @@
+/*
+  LIMT theme tokens.
+  ⚠️ Placeholder values — memory only has LIMT described qualitatively
+  ("modern, clean, white, light"), not as confirmed hex codes. Swap these
+  for Carolyn-approved values before this ships. Structure/variable names
+  are the part meant to be final.
+*/
+[data-brand='limt'] {
+  --color-bg: #ffffff;
+  --color-surface: #fbf9f6;
+  --color-primary: #d9a5b3; /* soft pink accent — placeholder */
+  --color-primary-strong: #c98a9c;
+  --color-text: #2b2b2b;
+  --color-text-muted: #8a8a85;
+  --color-border: #e7e3dc;
+
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Cormorant Garamond', serif;
+
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
