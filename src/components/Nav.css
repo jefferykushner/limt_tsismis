@@ -65,3 +65,9 @@
 .nav--tsismis .nav__brand {
   color: var(--ube);
 }
+
+/* Append to Nav.css — fixes the wordmark still rendering in blush on
+   Tsismis pages now that Nav.jsx switches its text per brand. */
+.nav--tsismis .nav__brand {
+  color: var(--ube);
+}
