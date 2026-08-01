@@ -1,0 +1,142 @@
+.prod-legend {
+  font-size: 0.8rem;
+  color: var(--graphite);
+  margin: -6px 0 18px;
+  line-height: 1.6;
+}
+
+.prod-select {
+  padding: 9px 12px;
+  border: 1px solid var(--fog);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  text-transform: none;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.prod-hint {
+  font-size: 0.74rem;
+  color: var(--graphite);
+  margin-top: -8px;
+}
+
+.prod-category-header {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--fog);
+  color: var(--ink);
+  background: var(--cream);
+}
+
+.prod-flag {
+  margin-left: 6px;
+  font-size: 0.8rem;
+  color: var(--blush);
+}
+
+.prod-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 260px;
+}
+
+.prod-chip {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--fog);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.prod-no-allergen {
+  font-size: 0.74rem;
+  color: var(--graphite);
+  font-style: italic;
+}
+
+.prod-both-badge {
+  font-size: 0.68rem;
+  color: var(--graphite);
+  font-weight: 600;
+}
+
+.prod-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+.prod-toggle:hover { opacity: 0.85; }
+
+.prod-edit-row td {
+  background: var(--cream);
+  padding: 18px 16px !important;
+  cursor: default;
+}
+
+.prod-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.prod-edit-grid .span-2 { grid-column: span 2; }
+
+.prod-chip-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.prod-chip--pickable {
+  border: 1px solid var(--fog);
+  background: var(--white);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.12s ease;
+}
+.prod-chip--pickable.prod-chip--on {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+.dash--tsismis .prod-chip--pickable.prod-chip--on {
+  background: var(--ube);
+  border-color: var(--ube);
+}
+
+.prod-checkbox-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+.prod-checkbox-field label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.prod-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .prod-edit-grid { grid-template-columns: 1fr; }
+  .prod-edit-grid .span-2 { grid-column: span 1; }
+}
