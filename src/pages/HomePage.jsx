@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useRevealAll } from '../hooks/useReveal'
 import { LG } from '../components/LG'
 import './HomePage.css'
+import FeaturedCollections from '../components/FeaturedCollections'
 
 /* ── Bake card data ───────────────────────────────────────── */
 /* LIMT only now — Tsismis has its own featured bakes on TsismisHomePage. */
@@ -51,6 +52,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <FeaturedCollections />
 
       {/* ── INTRO STRIP ──────────────────────────────────── */}
       <div className="hp-strip">
