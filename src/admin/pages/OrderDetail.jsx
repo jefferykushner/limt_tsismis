@@ -127,7 +127,7 @@ function OrderEditor({ orderId }) {
       const [{ data: clientData }, { data: itemsData }, { data: productsData }, { data: notesData }] = await Promise.all([
         supabase.from('clients').select('*').eq('id', orderData.client_id).single(),
         supabase.from('line_items').select('*').eq('order_id', orderId).order('sort_order'),
-        supabase.from('products').select('*').eq('brand_id', orderData.brand_id).eq('is_active', true).order('category'),
+        supabase.from('products').select('*').or(`brand_id.eq.${orderData.brand_id},shown_both_brands.eq.true`).eq('is_active', true).order('category'),
         supabase.from('order_notes').select('*').eq('order_id', orderId).order('sort_order'),
       ])
       setClient(clientData || null)
