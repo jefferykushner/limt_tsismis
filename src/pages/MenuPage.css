@@ -277,3 +277,20 @@
   border-radius: 8px;
   margin-bottom: 10px;
 }
+
+/* ── Added for live Supabase-backed menu ─────────────────── */
+
+.menu-loading {
+  text-align: center;
+  padding: 60px 24px;
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--graphite);
+}
+
+.menu-item__price--muted {
+  color: var(--graphite);
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
