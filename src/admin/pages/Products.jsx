@@ -22,6 +22,7 @@ const BRAND_LABEL = { limt: 'LIMT', tsismis: 'Tsismis' }
 const ALLERGEN_OPTIONS = ['Wheat/Gluten', 'Milk/Dairy', 'Eggs', 'Tree Nuts', 'Peanuts', 'Soy', 'Sesame', 'Fish', 'Shellfish', 'Mustard', 'Sulphites']
 
 const emptyEdit = {
+  name: '', category: '', brand_id: 'limt',
   description: '', base_price: '', launch_status: 'core', price_type: '', minimum_order: '',
   sizes: '', flavours: '', ingredients: '', allergens: [], allergen_notes: '', dietary_tags: '',
   lead_time: '', pickup_available: true, delivery_available: false, featured: false, seasonal: false,
@@ -37,6 +38,10 @@ export default function Products() {
   const [expandedId, setExpandedId] = useState(null)
   const [editForm, setEditForm] = useState(emptyEdit)
   const [editSaving, setEditSaving] = useState(false)
+  const [renamingCategory, setRenamingCategory] = useState(null)
+  const [renameValue, setRenameValue] = useState('')
+  const [featuringCategory, setFeaturingCategory] = useState(null)
+  const [featureBlurb, setFeatureBlurb] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -60,6 +65,11 @@ export default function Products() {
     }
     return [...map.entries()]
   }, [products])
+
+  const categoryOptions = useMemo(
+    () => [...new Set(products.map((p) => p.category).filter(Boolean))].sort(),
+    [products]
+  )
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -95,6 +105,9 @@ export default function Products() {
     }
     setExpandedId(product.id)
     setEditForm({
+      name: product.name || '',
+      category: product.category || '',
+      brand_id: product.brand_id || 'limt',
       description: product.description || '',
       base_price: product.base_price ?? '',
       launch_status: product.launch_status || 'core',
@@ -127,6 +140,9 @@ export default function Products() {
   const saveEdit = async (productId) => {
     setEditSaving(true)
     await supabase.from('products').update({
+      name: editForm.name.trim(),
+      category: editForm.category.trim() || null,
+      brand_id: editForm.brand_id,
       description: editForm.description.trim() || null,
       base_price: editForm.base_price === '' ? null : Number(editForm.base_price),
       launch_status: editForm.launch_status,
@@ -152,6 +168,50 @@ export default function Products() {
     load()
   }
 
+  const startRenameCategory = (category) => {
+    setRenamingCategory(category)
+    setRenameValue(category === 'Uncategorized' ? '' : category)
+  }
+
+  const saveRenameCategory = async (oldCategory) => {
+    const trimmed = renameValue.trim()
+    setRenamingCategory(null)
+    if (!trimmed || trimmed === oldCategory) return
+    if (oldCategory === 'Uncategorized') {
+      await supabase.from('products').update({ category: trimmed }).is('category', null)
+    } else {
+      await supabase.from('products').update({ category: trimmed }).eq('category', oldCategory)
+    }
+    load()
+  }
+
+  const isCategoryFeatured = (items) => items.some((p) => p.featured_category)
+
+  const startFeatureCategory = (category, items) => {
+    const existingBlurb = items.find((p) => p.collection_blurb)?.collection_blurb || ''
+    setFeaturingCategory(category)
+    setFeatureBlurb(existingBlurb)
+  }
+
+  const saveFeatureCategory = async (category) => {
+    setFeaturingCategory(null)
+    const filter = category === 'Uncategorized' ? { category: null } : { category }
+    let query = supabase.from('products').update({
+      featured_category: true,
+      collection_blurb: featureBlurb.trim() || null,
+    })
+    query = category === 'Uncategorized' ? query.is('category', null) : query.eq('category', category)
+    await query
+    load()
+  }
+
+  const unfeatureCategory = async (category) => {
+    let query = supabase.from('products').update({ featured_category: false, collection_blurb: null })
+    query = category === 'Uncategorized' ? query.is('category', null) : query.eq('category', category)
+    await query
+    load()
+  }
+
   return (
     <div>
       <div className="dash-topbar">
@@ -166,8 +226,13 @@ export default function Products() {
 
       <p className="prod-legend">
         <span className="pill pill--paid">Website</span> controls whether an item shows on the public menu.{' '}
-        <span className="pill pill--paid">Orderable</span> controls whether it can be added to an invoice. Click either pill to toggle it. Click a row to edit ingredients, allergens, and other details.
+        <span className="pill pill--paid">Orderable</span> controls whether it can be added to an invoice. Click either pill to toggle it. Click a row to edit its name, category, brand, ingredients, allergens, and other details.{' '}
+        Use <strong>Feature on Homepage</strong> next to a category name to make that whole collection appear as its own section on the homepage, below the hero.
       </p>
+
+      <datalist id="prod-category-options">
+        {categoryOptions.map((c) => <option key={c} value={c} />)}
+      </datalist>
 
       {showForm && (
         <form className="dash-card" onSubmit={handleAdd} style={{ marginBottom: 24 }}>
@@ -187,7 +252,12 @@ export default function Products() {
             </label>
             <label className="dash-field">
               <span>Category</span>
-              <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} placeholder="e.g. Celebration Cakes" />
+              <input
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="e.g. Celebration Cakes"
+                list="prod-category-options"
+              />
             </label>
             <label className="dash-field">
               <span>Name</span>
@@ -224,7 +294,57 @@ export default function Products() {
       ) : (
         grouped.map(([category, items]) => (
           <div className="dash-card prod-category-card" key={category} style={{ padding: 0, marginBottom: 20 }}>
-            <div className="prod-category-header">{category}</div>
+            <div className="prod-category-header">
+              {renamingCategory === category ? (
+                <span className="prod-rename-row">
+                  <input
+                    autoFocus
+                    className="prod-rename-input"
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') saveRenameCategory(category)
+                      if (e.key === 'Escape') setRenamingCategory(null)
+                    }}
+                  />
+                  <button type="button" className="dash-btn" onClick={() => saveRenameCategory(category)}>Save</button>
+                  <button type="button" className="dash-btn dash-btn--ghost" onClick={() => setRenamingCategory(null)}>Cancel</button>
+                </span>
+              ) : featuringCategory === category ? (
+                <span className="prod-rename-row">
+                  <input
+                    autoFocus
+                    className="prod-rename-input"
+                    style={{ minWidth: 320 }}
+                    placeholder="Short blurb for the homepage (optional)"
+                    value={featureBlurb}
+                    onChange={(e) => setFeatureBlurb(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') saveFeatureCategory(category)
+                      if (e.key === 'Escape') setFeaturingCategory(null)
+                    }}
+                  />
+                  <button type="button" className="dash-btn" onClick={() => saveFeatureCategory(category)}>Save &amp; Feature</button>
+                  <button type="button" className="dash-btn dash-btn--ghost" onClick={() => setFeaturingCategory(null)}>Cancel</button>
+                </span>
+              ) : (
+                <span className="prod-rename-row">
+                  {category}
+                  <button type="button" className="prod-rename-btn" onClick={() => startRenameCategory(category)} title={`Rename "${category}" everywhere it's used`}>
+                    Rename
+                  </button>
+                  {isCategoryFeatured(items) ? (
+                    <button type="button" className="prod-feature-btn prod-feature-btn--on" onClick={() => unfeatureCategory(category)} title="Remove from homepage">
+                      ★ Featured on Homepage
+                    </button>
+                  ) : (
+                    <button type="button" className="prod-feature-btn" onClick={() => startFeatureCategory(category, items)} title="Show this category on the homepage">
+                      Feature on Homepage
+                    </button>
+                  )}
+                </span>
+              )}
+            </div>
             <table className="dash-table">
               <thead>
                 <tr>
@@ -277,6 +397,26 @@ export default function Products() {
                       <tr key={`${p.id}-edit`} className="prod-edit-row">
                         <td colSpan={6}>
                           <div className="prod-edit-grid">
+                            <label className="dash-field span-2">
+                              <span>Name</span>
+                              <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} required />
+                            </label>
+                            <label className="dash-field">
+                              <span>Category</span>
+                              <input
+                                value={editForm.category}
+                                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                list="prod-category-options"
+                                placeholder="e.g. Celebration Cakes"
+                              />
+                            </label>
+                            <label className="dash-field">
+                              <span>Brand</span>
+                              <select className="prod-select" value={editForm.brand_id} onChange={(e) => setEditForm({ ...editForm, brand_id: e.target.value })}>
+                                <option value="limt">LIMT</option>
+                                <option value="tsismis">Tsismis</option>
+                              </select>
+                            </label>
                             <label className="dash-field span-2">
                               <span>Description</span>
                               <textarea rows={2} value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} />

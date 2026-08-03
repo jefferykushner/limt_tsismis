@@ -64,6 +64,60 @@
   font-style: italic;
 }
 
+.prod-rename-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prod-rename-btn {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--graphite);
+  background: none;
+  border: 1px solid var(--fog);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.prod-rename-btn:hover { color: var(--ink); border-color: var(--graphite); }
+
+.prod-rename-input {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  padding: 6px 10px;
+  border: 1px solid var(--fog);
+  border-radius: 6px;
+  min-width: 220px;
+}
+
+.prod-feature-btn {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--graphite);
+  background: none;
+  border: 1px solid var(--fog);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.prod-feature-btn:hover { color: var(--ink); border-color: var(--graphite); }
+.prod-feature-btn--on {
+  color: var(--white);
+  background: var(--blush);
+  border-color: var(--blush);
+}
+.dash--tsismis .prod-feature-btn--on { background: var(--ube); border-color: var(--ube); }
+.prod-feature-btn--on:hover { opacity: 0.88; color: var(--white); }
+
 .prod-both-badge {
   font-size: 0.68rem;
   color: var(--graphite);
