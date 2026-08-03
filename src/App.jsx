@@ -8,6 +8,7 @@ import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import TsismisHomePage from './pages/TsismisHomePage'
 import MenuPage from './pages/MenuPage'
+import TsismisHomePage from './pages/TsismisHomePage'
 import Login from './pages/Login'
 
 // LG's shared circle-breakout mechanic. The earlier [data-brand]-scoped
