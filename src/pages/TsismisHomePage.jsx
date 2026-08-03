@@ -1,178 +1,167 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRevealAll } from '../hooks/useReveal'
 import { LG } from '../components/LG'
+import { supabase } from '../lib/supabaseClient'
+import { money } from '../admin/invoiceMath'
 import './TsismisHomePage.css'
 
-const BAKES = [
-  { name: 'Ube Halaya Tart',        price: 'From $16' },
-  { name: 'Polvoron (6)',           price: 'From $10' },
-  { name: 'Pasalubong Classic Box', price: 'From $38' },
-  { name: 'Turon (3)',              price: 'From $9' },
-  { name: 'Kutsinta (4)',           price: 'From $9' },
-  { name: 'Leche Flan',             price: 'From $18' },
-]
-
 /* ══════════════════════════════════════════════════════════
-   TsismisHomePage — Filipino-forward, cheeky, in on the secret
+   TsismisHomePage
    ══════════════════════════════════════════════════════════ */
 export default function TsismisHomePage() {
   const pageRef = useRevealAll()
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_visible', true)
+        .or('brand_id.eq.tsismis,shown_both_brands.eq.true')
+        .order('sort_order')
+        .limit(6)
+      if (!error && data) setItems(data)
+      setLoading(false)
+    }
+    load()
+  }, [])
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="ts-page">
 
       {/* ── HERO ─────────────────────────────────────────── */}
-      <section className="tp-hero" aria-label="Welcome to Tsismis">
-        <div className="tp-hero__text">
-          <p className="tp-hero__eyebrow">Handcrafted in Toronto · You Didn't Hear This From Me</p>
-          <h1 className="tp-hero__headline">
-            Every bite<br />comes with<br /><em>a secret.</em>
+      <section className="ts-hero" aria-label="Welcome to Tsismis">
+        <div className="ts-hero__text">
+          <p className="ts-hero__eyebrow">You Didn't Hear This From Me</p>
+          <h1 className="ts-hero__headline">
+            The bakery<br />everyone's<br /><em>talking about.</em>
           </h1>
-          <p className="tp-hero__sub">
-            Filipino-inspired treats with a personality. Polvoron, ube everything,
-            and pasalubong boxes made for gifting — and gossiping over.
+          <p className="ts-hero__sub">
+            Filipino-inspired treats with a personality problem. Ube everything,
+            pasalubong boxes, and the kind of sweets that start conversations.
+            We won't say who told us to make these. (It was Carolyn.)
           </p>
-          <div className="tp-hero__actions">
-            <Link to="/tsismis/menu" className="btn btn--ube">See the Menu</Link>
-            <Link to="/story" className="btn btn--outline">Meet LG</Link>
+          <div className="ts-hero__actions">
+            <Link to="/menu" className="btn btn--ube">See the Goods</Link>
+            <a href="#story" className="btn btn--outline-ube">Spill the Tea</a>
           </div>
         </div>
 
-        <div className="tp-hero__visual" aria-hidden="true">
-          <div className="lg-photo">
-            <LG pose="hero" className="lg-photo__img" />
+        <div className="ts-hero__visual" aria-hidden="true">
+          <div className="ts-hero__lg-wrap">
+            <LG pose="hero" breakout className="ts-hero__lg-img" />
+            <p className="ts-hero__lg-caption">
+              LG — same mascot, messier mouth.
+            </p>
           </div>
-          <p className="tp-hero__lg-caption">
-            LG has something to tell you. It's probably about dessert.
-          </p>
         </div>
       </section>
 
       {/* ── INTRO STRIP ──────────────────────────────────── */}
-      <div className="tp-strip">
+      <div className="ts-strip">
         {[
+          'Filipino-Inspired',
           'Made to Order',
           'Toronto Pickup & Delivery',
-          'Filipino-Inspired Flavours',
-          'Custom Pasalubong Boxes',
+          "Ask Us Anything (We'll Probably Tell You)",
         ].map((text) => (
-          <div key={text} className="tp-strip__item">
-            <span className="tp-strip__dot" aria-hidden="true" />
-            <span className="tp-strip__text">{text}</span>
+          <div key={text} className="ts-strip__item">
+            <span className="ts-strip__dot" aria-hidden="true" />
+            <span className="ts-strip__text">{text}</span>
           </div>
         ))}
       </div>
 
-      {/* ── BACK TO LIMT TEASER ──────────────────────────── */}
-      <section className="tp-teaser reveal" aria-label="Also from Love in My Tummy">
-        <div className="container tp-teaser__inner">
-          <div>
-            <span className="tp-teaser__label">Keeping It Between Us</span>
-            <p className="tp-teaser__body">
-              Tsismis comes from the same kitchen as Love in My Tummy — artisan
-              breads, cakes, and everyday bakes, if that's more your (quieter) speed.
-            </p>
-          </div>
-          <Link to="/" className="btn btn--blush">Visit Love in My Tummy</Link>
-        </div>
-      </section>
-
       {/* ── STORY ────────────────────────────────────────── */}
-      <section className="tp-story section" id="story" aria-label="Our story">
+      <section className="ts-story section" id="story" aria-label="About Tsismis">
         <div className="container">
-          <div className="tp-story__inner">
+          <div className="ts-story__inner">
 
-            <div className="tp-story__visual reveal" aria-hidden="true">
-              <LG pose="aboutIntro" className="lg-story-photo" />
-              <p className="tp-story__lg-label">LG — Little Girl, Little Gossip.</p>
+            <div className="ts-story__visual reveal" aria-hidden="true">
+              <LG pose="aboutIntro" className="ts-story__lg-img" />
+              <p className="ts-story__lg-label">LG, mid-secret.</p>
             </div>
 
             <div className="reveal">
-              <p className="tp-story__eyebrow">Meet LG</p>
-              <h2 className="tp-story__heading">
-                She knows<br />the <em>tea.</em>
+              <p className="ts-story__eyebrow">The Whole Story (Allegedly)</p>
+              <h2 className="ts-story__heading">
+                Tsismis means<br /><em>gossip.</em>
               </h2>
-              <p className="tp-story__body">
-                LG is our mascot — short for Little Girl, which is what Carolyn's
-                dad called her growing up. Over here, she's the one whispering
-                which tray just came out of the oven.
+              <p className="ts-story__body">
+                Tsismis is the breakout child of Love in My Tummy — same kitchen,
+                same LG, a lot more attitude. This is where Carolyn's love for
+                Filipino flavours gets to be as loud, cheeky, and unapologetic as
+                it wants to be.
               </p>
-              <p className="tp-story__body">
-                Tsismis is Carolyn's love letter to the flavours she grew up
-                with — ube, kalamay, polvoron, all the things worth telling
-                someone about. Made fresh, made to order, made with pride.
+              <p className="ts-story__body">
+                Ube, pandan, calamansi, macapuno — the flavours she grew up on,
+                made the way she actually wants to make them. If LIMT is the
+                warm hug, Tsismis is the friend who tells you the good stuff
+                first and asks questions later.
               </p>
-              <p className="tp-story__sig">— Carolyn</p>
+              <p className="ts-story__body">
+                Everything's still made to order, still made by hand. We just
+                talk about it differently.
+              </p>
+              <p className="ts-story__sig">— LG, allegedly</p>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* ── FEATURED BAKES ───────────────────────────────── */}
-      <section className="tp-bakes section" id="bakes" aria-label="Featured bakes">
+      {/* ── FEATURED ITEMS ───────────────────────────────── */}
+      <section className="ts-menu section" aria-label="What's baking at Tsismis">
         <div className="container">
-          <div className="tp-bakes__header reveal">
-            <p className="tp-bakes__eyebrow">Word on the Street</p>
-            <h2 className="tp-bakes__heading">What everyone's <em>talking about.</em></h2>
+          <div className="ts-menu__header reveal">
+            <p className="ts-menu__eyebrow">Currently Being Discussed</p>
+            <h2 className="ts-menu__heading">What's <em>brewing.</em></h2>
           </div>
         </div>
 
-        <div className="tp-bakes__grid">
-          {BAKES.map((item, i) => (
-            <div
-              key={item.name}
-              className="tp-bake-card reveal"
-              style={{ '--card-index': i }}
-            >
-              <div className="tp-bake-card__img" aria-hidden="true" />
-              <div className="tp-bake-card__overlay" aria-hidden="true" />
-              <div className="tp-bake-card__content">
-                <p className="tp-bake-card__brand">Tsismis</p>
-                <h3 className="tp-bake-card__name">{item.name}</h3>
-                <p className="tp-bake-card__price">{item.price}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="container" style={{ marginTop: '40px', textAlign: 'center' }}>
-          <Link to="/tsismis/menu" className="btn btn--ube">View Full Menu</Link>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ─────────────────────────────────── */}
-      <section className="tp-how section" aria-label="How to order">
-        <div className="container">
-          <div className="tp-how__header reveal">
-            <p className="tp-how__eyebrow">The Process</p>
-            <h2 className="tp-how__heading">How to get <em>in on it.</em></h2>
-          </div>
-          <div className="tp-how__steps">
-            {[
-              {
-                n: '1',
-                title: 'Browse the Menu',
-                desc: 'Have a look at what\'s baking. Custom pasalubong box in mind? We\'re listening.',
-              },
-              {
-                n: '2',
-                title: 'Send a Quote Request',
-                desc: 'Tell us what you want, your pickup date, and any customizations. We confirm within 24 hours.',
-              },
-              {
-                n: '3',
-                title: 'Pickup or Delivery',
-                desc: 'Fresh, made-to-order, ready exactly when you need it — for yourself, or to spill to a whole crowd.',
-              },
-            ].map((step) => (
-              <div key={step.n} className="tp-how__step reveal">
-                <span className="tp-how__num">{step.n}</span>
-                <h3 className="tp-how__step-title">{step.title}</h3>
-                <p className="tp-how__step-desc">{step.desc}</p>
+        {loading ? (
+          <p className="ts-menu__loading">Loading the goods…</p>
+        ) : items.length === 0 ? (
+          <p className="ts-menu__loading">New things are coming — check back soon.</p>
+        ) : (
+          <div className="ts-menu__grid">
+            {items.map((item, i) => (
+              <div key={item.id} className="ts-item-card reveal" style={{ '--card-index': i }}>
+                <div
+                  className="ts-item-card__img"
+                  style={item.image_url ? { backgroundImage: `url(${item.image_url})` } : undefined}
+                  aria-hidden="true"
+                />
+                <div className="ts-item-card__overlay" aria-hidden="true" />
+                <div className="ts-item-card__content">
+                  <h3 className="ts-item-card__name">{item.name}</h3>
+                  <p className="ts-item-card__price">
+                    {item.base_price ? money(item.base_price) : 'Ask for pricing'}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
+        )}
+
+        <div className="container" style={{ marginTop: 40, textAlign: 'center' }}>
+          <Link to="/menu" className="btn btn--ube">View Full Menu</Link>
+        </div>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────── */}
+      <section className="ts-cta" aria-label="Order from Tsismis">
+        <div className="container ts-cta__inner reveal">
+          <p className="ts-cta__eyebrow">Catering &amp; Custom Orders</p>
+          <h2 className="ts-cta__heading">Ready to <em>spill</em> your order?</h2>
+          <p className="ts-cta__body">
+            Meryenda spreads, pasalubong stations, event catering, or just a box
+            of turon for yourself — no judgment. Tell us what you're planning.
+          </p>
+          <Link to="/order" className="btn btn--ube">Get in Touch</Link>
         </div>
       </section>
 
