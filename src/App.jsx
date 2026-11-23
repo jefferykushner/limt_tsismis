@@ -9,11 +9,11 @@ import HomePage from './pages/HomePage'
 import TsismisHomePage from './pages/TsismisHomePage'
 import MenuPage from './pages/MenuPage'
 import Login from './pages/Login'
+import OrderPage from './pages/OrderPage'
+import NotFoundPage from './pages/NotFoundPage'
+import ScrollToHash from './components/ScrollToHash'
 
-// LG's shared circle-breakout mechanic. The earlier [data-brand]-scoped
-// limt.theme.css / tsismis.theme.css files have been retired — delete them
-// from /src/brand, they duplicated the real tokens.css system and were
-// never actually referenced anywhere else in the app.
+// LG's shared circle-breakout mechanic.
 import './components/lg-mascot.css'
 
 // Admin and account sections are lazy-loaded so their code never
@@ -32,6 +32,7 @@ const OrderView = lazy(() => import('./account/pages/OrderView'))
 function PublicLayout({ children }) {
   return (
     <>
+      <ScrollToHash />
       <Nav />
       {children}
       <Footer />
@@ -54,6 +55,7 @@ export default function App() {
               {/* LIMT — the default public experience */}
               <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
               <Route path="/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
+              <Route path="/order" element={<PublicLayout><OrderPage /></PublicLayout>} />
 
               {/* Tsismis — its own distinct shell, same MenuPage component
                   (it reads the active brand from BrandContext, which
@@ -61,6 +63,7 @@ export default function App() {
                   component is needed here). */}
               <Route path="/tsismis" element={<PublicLayout><TsismisHomePage /></PublicLayout>} />
               <Route path="/tsismis/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
+              <Route path="/tsismis/order" element={<PublicLayout><OrderPage /></PublicLayout>} />
 
               <Route path="/login" element={<Login />} />
 
@@ -84,6 +87,8 @@ export default function App() {
                   <Route path="orders/:id" element={<OrderView />} />
                 </Route>
               </Route>
+
+              <Route path="*" element={<PublicLayout><NotFoundPage /></PublicLayout>} />
             </Routes>
           </Suspense>
         </BrandProvider>

@@ -45,7 +45,7 @@ export default function TsismisHomePage() {
             We won't say who told us to make these. (It was Carolyn.)
           </p>
           <div className="ts-hero__actions">
-            <Link to="/menu" className="btn btn--ube">See the Goods</Link>
+            <Link to="/tsismis/menu" className="btn btn--ube">See the Goods</Link>
             <a href="#story" className="btn btn--outline-ube">Spill the Tea</a>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function TsismisHomePage() {
         )}
 
         <div className="container" style={{ marginTop: 40, textAlign: 'center' }}>
-          <Link to="/menu" className="btn btn--ube">View Full Menu</Link>
+          <Link to="/tsismis/menu" className="btn btn--ube">View Full Menu</Link>
         </div>
       </section>
 
@@ -161,7 +161,7 @@ export default function TsismisHomePage() {
             Meryenda spreads, pasalubong stations, event catering, or just a box
             of turon for yourself — no judgment. Tell us what you're planning.
           </p>
-          <Link to="/order" className="btn btn--ube">Get in Touch</Link>
+          <Link to="/tsismis/order" className="btn btn--ube">Get in Touch</Link>
         </div>
       </section>
 

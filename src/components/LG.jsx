@@ -24,10 +24,6 @@ export function LG({ pose, className = '', breakout = false, ...imgProps }) {
     return null;
   }
 
-  if (import.meta.env?.DEV && !brandPoses[pose]) {
-    console.warn(`<LG>: pose "${pose}" not defined for brand "${brand.key}", using fallback`);
-  }
-
   const classes = ['lg-mascot', `lg-mascot--${pose}`, breakout && 'lg-mascot--breakout', className]
     .filter(Boolean)
     .join(' ');
