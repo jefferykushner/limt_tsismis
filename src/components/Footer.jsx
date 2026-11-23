@@ -44,6 +44,11 @@ export default function Footer() {
           <ul>
             <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
             <li>
+              <a href="https://www.instagram.com/loveinmytummysweets/" target="_blank" rel="noreferrer">
+                Instagram @loveinmytummysweets
+              </a>
+            </li>
+            <li>
               <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
                 Instagram <span className="footer__handle">@loveinmytummysweets</span>
               </a>
