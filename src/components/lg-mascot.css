@@ -11,7 +11,7 @@
 .lg-mascot {
   display: block;
   max-width: 100%;
-  height: auto;
+  /* each placement sets its own height (width follows), so no height here */
 }
 
 /* Standard breakout: used in hero sections, how-it-works cards, sidebar
