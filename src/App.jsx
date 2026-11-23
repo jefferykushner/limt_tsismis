@@ -3,15 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { BrandProvider } from './brand/BrandContext'
 import { AdminRoute, CustomerRoute } from './routes/RoleRoutes'
-import Nav from './components/Nav'
-import Footer from './components/Footer'
+import PublicLayout from './components/PublicLayout'
 import HomePage from './pages/HomePage'
-import TsismisHomePage from './pages/TsismisHomePage'
 import MenuPage from './pages/MenuPage'
 import Login from './pages/Login'
 import OrderPage from './pages/OrderPage'
 import NotFoundPage from './pages/NotFoundPage'
-import ScrollToHash from './components/ScrollToHash'
 
 // LG's shared circle-breakout mechanic.
 import './components/lg-mascot.css'
@@ -28,17 +25,6 @@ const Products = lazy(() => import('./admin/pages/Products'))
 const AccountLayout = lazy(() => import('./account/AccountLayout'))
 const MyOrders = lazy(() => import('./account/pages/MyOrders'))
 const OrderView = lazy(() => import('./account/pages/OrderView'))
-
-function PublicLayout({ children }) {
-  return (
-    <>
-      <ScrollToHash />
-      <Nav />
-      {children}
-      <Footer />
-    </>
-  )
-}
 
 export default function App() {
   return (
@@ -61,7 +47,7 @@ export default function App() {
                   (it reads the active brand from BrandContext, which
                   resolves from the /tsismis prefix, so no separate menu
                   component is needed here). */}
-              <Route path="/tsismis" element={<PublicLayout><TsismisHomePage /></PublicLayout>} />
+              <Route path="/tsismis" element={<PublicLayout><HomePage /></PublicLayout>} />
               <Route path="/tsismis/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
               <Route path="/tsismis/order" element={<PublicLayout><OrderPage /></PublicLayout>} />
 

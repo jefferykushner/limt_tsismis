@@ -1,0 +1,181 @@
+/* ═══════════════════════════════════════════════════════
+   Public site design system
+   One structure, two skins. Every public page sits inside
+   <div class="site" data-brand="limt|tsismis">, and only the
+   semantic tokens below change between brands.
+   The admin and account areas keep using tokens.css as-is.
+   Palette values match the image-studio brief, so photos and
+   illustrations made for the site share the same colours.
+   ═══════════════════════════════════════════════════════ */
+
+.site {
+  /* Love in My Tummy (default) */
+  --bg: #FFFDFB;
+  --panel: #FBF7F2;
+  --ink: #3B2A24;
+  --ink-soft: #5C4A42;
+  --muted: #7D6A62;
+  --line: #EADFD7;
+  --accent: #A65E69;          /* text accent, 5:1 on --bg */
+  --accent-soft: #F6E4E6;
+  --button: #3B2A24;
+  --button-hover: #57413A;
+  --button-ink: #FFFDFB;
+  --wash-1: #D79CA3;          /* blush */
+  --wash-2: #F2D3C4;          /* peach */
+  --wash-3: #DCE5DA;          /* sage */
+  --wash-4: #E8DDEE;          /* lavender */
+  --focus: #A65E69;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Jost', 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
+
+  --nav-h: 72px;
+  --max-w: 1160px;
+  --gutter: clamp(20px, 5vw, 64px);
+  --radius: 14px;
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.65;
+  min-height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.site[data-brand='tsismis'] {
+  --bg: #FFFAF1;
+  --panel: #FCF0D6;
+  --ink: #1E2B4A;             /* deep navy */
+  --ink-soft: #3A4766;
+  --muted: #5F6884;
+  --line: #EEDFC2;
+  --accent: #C8323B;          /* flag red, 5:1 on --bg */
+  --accent-soft: #FBE3DF;
+  --button: #2F5DA8;          /* flag blue */
+  --button-hover: #244B8C;
+  --button-ink: #FFFFFF;
+  --wash-1: #F2C94C;          /* sun gold */
+  --wash-2: #9DB6E0;          /* soft blue */
+  --wash-3: #EFA3A0;          /* soft red */
+  --wash-4: #C9B4E0;          /* ube */
+  --focus: #2F5DA8;
+}
+
+.site *:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.site a { color: inherit; }
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 300;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--button);
+  color: var(--button-ink);
+  text-decoration: none;
+}
+.skip-link:focus { top: 12px; }
+
+.site-main {
+  padding-top: var(--nav-h);
+}
+
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ── Type ──────────────────────────────────────────────── */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  font-size: clamp(44px, 6.2vw, 84px);
+}
+
+.heading {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.12;
+  font-size: clamp(32px, 3.6vw, 48px);
+}
+
+.subheading {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.lede {
+  font-size: clamp(18px, 1.5vw, 20px);
+  color: var(--ink-soft);
+  max-width: 34em;
+}
+
+.whisper {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.2;
+  color: var(--accent);
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: 999px;
+  border: 1.5px solid var(--button);
+  background: var(--button);
+  color: var(--button-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.button:hover { background: var(--button-hover); border-color: var(--button-hover); }
+
+.button--quiet {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+.button--quiet:hover { background: var(--panel); border-color: var(--ink-soft); }
+
+.text-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.text-link:hover { text-decoration-thickness: 2px; }
+
+/* ── Section rhythm ────────────────────────────────────── */
+.band {
+  padding: clamp(64px, 9vw, 120px) 0;
+  position: relative;
+}
+.band--panel { background: var(--panel); }
+
+@media (prefers-reduced-motion: reduce) {
+  .site, .site * { transition: none !important; animation: none !important; }
+}

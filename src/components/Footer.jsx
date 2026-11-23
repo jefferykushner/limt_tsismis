@@ -1,60 +1,56 @@
 import { Link } from 'react-router-dom'
 import { useBrand } from '../brand/BrandContext'
 import { brandPaths } from '../brand/brandPaths'
+import { brandContent } from '../brand/brandContent'
+import { useBrandSwitch } from '../brand/BrandSwitch'
+import { Heart, Sun } from './art/LineArt'
 import './Footer.css'
 
+const CONTACT_EMAIL = 'hello@loveinmytummy.ca'
+
 export default function Footer() {
-  const paths = brandPaths(useBrand().key)
+  const brand = useBrand()
+  const content = brandContent(brand.key)
+  const other = brandContent(brand.key === 'tsismis' ? 'limt' : 'tsismis')
+  const paths = brandPaths(brand.key)
+  const switchBrand = useBrandSwitch()
+  const Mark = brand.key === 'tsismis' ? Sun : Heart
+
   return (
     <footer className="footer">
-      <div className="footer__inner">
-        <div className="footer__top">
-
-          <div className="footer__about">
-            <p className="footer__brand-name">Love in My Tummy</p>
-            <p className="footer__brand-sub">&amp; Tsismis</p>
-            <p className="footer__brand-desc">
-              Handcrafted artisan bakes made to order in Toronto.
-              Filipino-inspired flavours, made with love.
-            </p>
-            <p className="footer__sig">— LG</p>
-          </div>
-
-          <div className="footer__col">
-            <p className="footer__col-title">Navigate</p>
-            <ul className="footer__col-links">
-              <li><Link to={paths.menu}>Menu</Link></li>
-              <li><Link to="/">Love in My Tummy</Link></li>
-              <li><Link to="/tsismis">Tsismis</Link></li>
-              <li><Link to={paths.story}>Our Story</Link></li>
-              <li><Link to={paths.order}>Order Now</Link></li>
-            </ul>
-          </div>
-
-          <div className="footer__col">
-            <p className="footer__col-title">Contact</p>
-            <ul className="footer__col-links">
-              <li><a href="mailto:hello@loveinmytummy.ca">hello@loveinmytummy.ca</a></li>
-              <li><a href="https://instagram.com/loveinmytummy" target="_blank" rel="noreferrer">Instagram</a></li>
-              <li><a href="https://facebook.com/loveinmytummy" target="_blank" rel="noreferrer">Facebook</a></li>
-              <li><a href="https://loveinmytummy.ca">loveinmytummy.ca</a></li>
-            </ul>
-          </div>
-
+      <div className="wrap footer__grid">
+        <div className="footer__brand">
+          <img src={content.logo.full} alt={content.name} className={`footer__logo footer__logo--${brand.key}`} />
+          <p className="footer__blurb">{content.footer.blurb}</p>
         </div>
 
-        <div className="footer__bottom">
-          <p className="footer__legal">
-            © {new Date().getFullYear()} Love in My Tummy. All rights reserved. Toronto, Ontario.
-            {' · '}
-            <Link to="/login" className="footer__login-link">Client Login</Link>
-          </p>
-          <div className="footer__social">
-            <a href="https://instagram.com/loveinmytummy" target="_blank" rel="noreferrer">Instagram</a>
-            <a href="https://facebook.com/loveinmytummy" target="_blank" rel="noreferrer">Facebook</a>
-            <a href="https://tiktok.com/@loveinmytummy" target="_blank" rel="noreferrer">TikTok</a>
-          </div>
+        <nav className="footer__col" aria-label="Footer">
+          <h2 className="footer__title">Visit</h2>
+          <ul>
+            <li><Link to={paths.menu}>Menu</Link></li>
+            <li><Link to={paths.story}>Our story</Link></li>
+            <li><Link to={paths.order}>Order</Link></li>
+            <li>
+              <button type="button" className="footer__switch" onClick={(e) => switchBrand(e.currentTarget)}>
+                {other.name}
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="footer__col">
+          <h2 className="footer__title">Say hello</h2>
+          <ul>
+            <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
+            <li>Pickup and delivery in Toronto</li>
+          </ul>
         </div>
+      </div>
+
+      <div className="wrap footer__base">
+        <Mark size={22} className="footer__mark" />
+        <p>© {new Date().getFullYear()} Love in My Tummy Artisan Sweets</p>
+        <Link to="/login" className="footer__login">Client login</Link>
       </div>
     </footer>
   )

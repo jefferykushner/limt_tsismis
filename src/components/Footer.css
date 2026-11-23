@@ -1,119 +1,60 @@
 .footer {
-  background: var(--ink);
-  padding: clamp(48px, 6vw, 80px) var(--gutter) 32px;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  padding: clamp(56px, 7vw, 88px) 0 28px;
+  font-size: 16px;
+  color: var(--ink-soft);
+  transition: background-color 0.4s ease;
 }
 
-.footer__inner {
-  max-width: var(--max-w);
-  margin: 0 auto;
-}
-
-.footer__top {
+.footer__grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: clamp(32px, 5vw, 80px);
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: clamp(32px, 5vw, 72px);
   padding-bottom: 48px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  margin-bottom: 32px;
 }
 
-.footer__brand-name {
-  font-family: var(--font-editorial);
-  font-size: 24px;
-  font-weight: 300;
-  font-style: italic;
-  color: var(--white);
-  margin-bottom: 4px;
+.footer__logo { display: block; width: auto; margin-bottom: 20px; }
+.footer__logo--limt { height: 96px; }
+.footer__logo--tsismis { height: 52px; }
+
+.footer__blurb { max-width: 28em; }
+
+.footer__title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 12px;
 }
 
-.footer__brand-sub {
-  font-family: var(--font-display);
-  font-size: 8px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--blush);
-  margin-bottom: 20px;
+.footer__col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.footer__col a,
+.footer__switch {
+  color: var(--ink-soft);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
+.footer__col a:hover,
+.footer__switch:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 
-.footer__brand-desc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.65;
-  max-width: 260px;
-}
-
-.footer__sig {
-  font-family: var(--font-editorial);
-  font-size: 20px;
-  font-style: italic;
-  color: var(--blush);
-  margin-top: 20px;
-}
-
-.footer__col-title {
-  font-family: var(--font-display);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
-  margin-bottom: 20px;
-}
-
-.footer__col-links {
-  list-style: none;
+.footer__base {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.footer__col-links a {
-  font-family: var(--font-editorial);
-  font-size: 15px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.55);
-  transition: color var(--ease);
-}
-
-.footer__col-links a:hover { color: var(--white); }
-
-.footer__bottom {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--muted);
 }
+.footer__mark { color: var(--accent); }
+.footer__login { margin-left: auto; color: var(--muted); }
 
-.footer__legal {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.25);
-  letter-spacing: 0.04em;
-}
-
-.footer__login-link {
-  color: rgba(255, 255, 255, 0.4);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color var(--ease);
-}
-.footer__login-link:hover { color: var(--blush); }
-
-.footer__social {
-  display: flex;
-  gap: 20px;
-}
-
-.footer__social a {
-  font-family: var(--font-display);
-  font-size: 9px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
-  transition: color var(--ease);
-}
-
-.footer__social a:hover { color: var(--blush); }
-
-@media (max-width: 860px) {
-  .footer__top { grid-template-columns: 1fr; }
+@media (max-width: 760px) {
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+  .footer__brand { grid-column: 1 / -1; }
 }

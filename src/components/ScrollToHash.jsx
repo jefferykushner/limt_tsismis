@@ -8,9 +8,11 @@ import { useLocation } from 'react-router-dom'
  * sections render only after their data loads.
  */
 export default function ScrollToHash() {
-  const { pathname, hash } = useLocation()
+  const { pathname, hash, state } = useLocation()
+  const keepScroll = Boolean(state?.brandSwitch)
 
   useEffect(() => {
+    if (keepScroll) return // brand switch: stay where you are on the page
     if (!hash) {
       window.scrollTo(0, 0)
       return
@@ -28,7 +30,7 @@ export default function ScrollToHash() {
     }
     attempt()
     return () => clearTimeout(timer)
-  }, [pathname, hash])
+  }, [pathname, hash, keepScroll])
 
   return null
 }

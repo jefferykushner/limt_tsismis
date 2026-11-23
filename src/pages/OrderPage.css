@@ -1,98 +1,78 @@
 .order-page {
-  padding: calc(var(--nav-h) + clamp(40px, 8vw, 96px)) 0 clamp(60px, 10vw, 120px);
+  padding: clamp(48px, 8vw, 104px) 0 clamp(64px, 10vw, 120px);
 }
 
 .order-page__inner {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: clamp(32px, 6vw, 80px);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 6vw, 88px);
   align-items: center;
 }
 
-.order-page__eyebrow {
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--blush);
-  margin-bottom: var(--space-md);
-}
-.order-page--tsismis .order-page__eyebrow { color: var(--ube); }
-
-.order-page__heading {
-  font-family: var(--font-editorial);
-  font-weight: 400;
-  font-size: clamp(36px, 5vw, 56px);
-  line-height: 1.1;
-  margin-bottom: var(--space-lg);
-}
-.order-page__heading em { color: var(--blush-dk); }
-.order-page--tsismis .order-page__heading em { color: var(--ube); }
-
-.order-page__intro {
-  max-width: 34em;
-  color: var(--ink-lt);
-  margin-bottom: var(--space-xl);
-}
+.order-page__heading { margin-bottom: 20px; font-size: clamp(44px, 5.4vw, 72px); }
+.order-page__intro { margin-bottom: 40px; }
 
 .order-page__steps {
   list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
   display: grid;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
+  gap: 22px;
 }
 
 .order-page__step {
   display: flex;
-  gap: var(--space-md);
+  gap: 18px;
   align-items: flex-start;
 }
 
+/* These are real steps in order, so they keep their numbers. */
 .order-page__num {
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-family: var(--font-editorial);
-  font-size: 18px;
-  background: var(--blush-lt);
-  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
-.order-page--tsismis .order-page__num { background: var(--ube-lt); }
 
 .order-page__step-title {
-  font-family: var(--font-editorial);
+  font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 20px;
-  line-height: 1.3;
+  font-size: 23px;
+  line-height: 1.25;
 }
-
-.order-page__step-desc {
-  color: var(--graphite);
-}
+.order-page__step-desc { color: var(--muted); }
 
 .order-page__actions {
   display: flex;
-  gap: var(--space-md);
+  gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: var(--space-md);
+  margin-bottom: 16px;
 }
 
-.order-page__note {
-  font-size: 14px;
-  color: var(--graphite);
-}
-.order-page__note a { text-decoration: underline; }
+.order-page__note { font-size: 15px; color: var(--muted); }
+.order-page__note a { color: var(--accent); }
 
+.order-page__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 10%;
+}
 .order-page__lg {
-  width: clamp(220px, 30vw, 400px);
-  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  width: min(100%, 360px);
+  height: auto;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .order-page__inner { grid-template-columns: 1fr; }
-  .order-page__visual { order: -1; }
-  .order-page__lg { width: 200px; }
+  .order-page__visual { order: -1; max-width: 280px; margin: 0 auto; }
 }
