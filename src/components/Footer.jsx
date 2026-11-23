@@ -7,6 +7,7 @@ import { Heart, Sun } from './art/LineArt'
 import './Footer.css'
 
 const CONTACT_EMAIL = 'hello@loveinmytummy.ca'
+const INSTAGRAM_URL = 'https://www.instagram.com/loveinmytummysweets/'
 
 export default function Footer() {
   const brand = useBrand()
@@ -42,6 +43,11 @@ export default function Footer() {
           <h2 className="footer__title">Say hello</h2>
           <ul>
             <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
+            <li>
+              <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
+                Instagram <span className="footer__handle">@loveinmytummysweets</span>
+              </a>
+            </li>
             <li>Pickup and delivery in Toronto</li>
           </ul>
         </div>
