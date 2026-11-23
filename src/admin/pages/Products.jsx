@@ -4,8 +4,7 @@ import { money } from '../invoiceMath'
 import './products.css'
 
 const emptyForm = {
-  brand_id: 'limt',
-  shown_both_brands: false,
+  is_filipino: false,
   category: '',
   name: '',
   description: '',
@@ -14,19 +13,17 @@ const emptyForm = {
   allergen_notes: '',
 }
 
-const BRAND_LABEL = { limt: 'LIMT', tsismis: 'Tsismis' }
-
 // Standard allergen vocabulary used across the menu. Kept as a fixed list so
 // tags stay consistent everywhere they're displayed (admin, invoices, and
 // eventually the public menu).
 const ALLERGEN_OPTIONS = ['Wheat/Gluten', 'Milk/Dairy', 'Eggs', 'Tree Nuts', 'Peanuts', 'Soy', 'Sesame', 'Fish', 'Shellfish', 'Mustard', 'Sulphites']
 
 const emptyEdit = {
-  name: '', category: '', brand_id: 'limt',
+  name: '', category: '', is_filipino: false,
   description: '', base_price: '', launch_status: 'core', price_type: '', minimum_order: '',
   sizes: '', flavours: '', ingredients: '', allergens: [], allergen_notes: '', dietary_tags: '',
-  lead_time: '', pickup_available: true, delivery_available: false, featured: false, seasonal: false,
-  shown_both_brands: false, image_url: '', internal_notes: '',
+  lead_time: '', pickup_available: true, delivery_available: false, featured_limt: false, featured_tsismis: false,
+  seasonal: false, image_url: '', internal_notes: '',
 }
 
 export default function Products() {
@@ -42,29 +39,37 @@ export default function Products() {
   const [renameValue, setRenameValue] = useState('')
   const [featuringCategory, setFeaturingCategory] = useState(null)
   const [featureBlurb, setFeatureBlurb] = useState('')
+  const [notes, setNotes] = useState({})
+  const [showArchived, setShowArchived] = useState(false)
 
   const load = async () => {
     setLoading(true)
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .order('category')
-      .order('sort_order')
+    const [{ data }, { data: noteRows }] = await Promise.all([
+      supabase.from('products').select('*').order('category').order('sort_order'),
+      supabase.from('product_notes').select('product_id, internal_notes'),
+    ])
     if (data) setProducts(data)
+    setNotes(Object.fromEntries((noteRows || []).map((n) => [n.product_id, n.internal_notes])))
     setLoading(false)
   }
 
   useEffect(() => { load() }, [])
 
+  const archivedCount = products.filter((p) => p.archived_at).length
+  const listed = useMemo(
+    () => products.filter((p) => (showArchived ? p.archived_at : !p.archived_at)),
+    [products, showArchived]
+  )
+
   const grouped = useMemo(() => {
     const map = new Map()
-    for (const p of products) {
+    for (const p of listed) {
       const key = p.category || 'Uncategorized'
       if (!map.has(key)) map.set(key, [])
       map.get(key).push(p)
     }
     return [...map.entries()]
-  }, [products])
+  }, [listed])
 
   const categoryOptions = useMemo(
     () => [...new Set(products.map((p) => p.category).filter(Boolean))].sort(),
@@ -76,8 +81,9 @@ export default function Products() {
     if (!form.name.trim()) return
     setSaving(true)
     await supabase.from('products').insert({
-      brand_id: form.brand_id,
-      shown_both_brands: form.shown_both_brands,
+      // brand_id only sets which brand an item was first made for; both brands show every item.
+      brand_id: form.is_filipino ? 'tsismis' : 'limt',
+      is_filipino: form.is_filipino,
       category: form.category.trim() || null,
       name: form.name.trim(),
       description: form.description.trim() || null,
@@ -107,7 +113,7 @@ export default function Products() {
     setEditForm({
       name: product.name || '',
       category: product.category || '',
-      brand_id: product.brand_id || 'limt',
+      is_filipino: product.is_filipino ?? false,
       description: product.description || '',
       base_price: product.base_price ?? '',
       launch_status: product.launch_status || 'core',
@@ -122,11 +128,11 @@ export default function Products() {
       lead_time: product.lead_time || '',
       pickup_available: product.pickup_available ?? true,
       delivery_available: product.delivery_available ?? false,
-      featured: product.featured ?? false,
+      featured_limt: product.featured_limt ?? false,
+      featured_tsismis: product.featured_tsismis ?? false,
       seasonal: product.seasonal ?? false,
-      shown_both_brands: product.shown_both_brands ?? false,
       image_url: product.image_url || '',
-      internal_notes: product.internal_notes || '',
+      internal_notes: notes[product.id] ?? '',
     })
   }
 
@@ -142,7 +148,7 @@ export default function Products() {
     await supabase.from('products').update({
       name: editForm.name.trim(),
       category: editForm.category.trim() || null,
-      brand_id: editForm.brand_id,
+      is_filipino: editForm.is_filipino,
       description: editForm.description.trim() || null,
       base_price: editForm.base_price === '' ? null : Number(editForm.base_price),
       launch_status: editForm.launch_status,
@@ -157,12 +163,16 @@ export default function Products() {
       lead_time: editForm.lead_time.trim() || null,
       pickup_available: editForm.pickup_available,
       delivery_available: editForm.delivery_available,
-      featured: editForm.featured,
+      featured_limt: editForm.featured_limt,
+      featured_tsismis: editForm.featured_tsismis,
       seasonal: editForm.seasonal,
-      shown_both_brands: editForm.shown_both_brands,
       image_url: editForm.image_url.trim() || null,
-      internal_notes: editForm.internal_notes.trim() || null,
     }).eq('id', productId)
+    await supabase.from('product_notes').upsert({
+      product_id: productId,
+      internal_notes: editForm.internal_notes.trim() || null,
+      updated_at: new Date().toISOString(),
+    })
     setEditSaving(false)
     setExpandedId(null)
     load()
@@ -181,6 +191,8 @@ export default function Products() {
       await supabase.from('products').update({ category: trimmed }).is('category', null)
     } else {
       await supabase.from('products').update({ category: trimmed }).eq('category', oldCategory)
+      // keep the category's menu subtitle and position with it
+      await supabase.from('categories').update({ name: trimmed }).eq('name', oldCategory)
     }
     load()
   }
@@ -226,9 +238,20 @@ export default function Products() {
 
       <p className="prod-legend">
         <span className="pill pill--paid">Website</span> controls whether an item shows on the public menu.{' '}
-        <span className="pill pill--paid">Orderable</span> controls whether it can be added to an invoice. Click either pill to toggle it. Click a row to edit its name, category, brand, ingredients, allergens, and other details.{' '}
-        Use <strong>Feature on Homepage</strong> next to a category name to make that whole collection appear as its own section on the homepage, below the hero.
+        <span className="pill pill--paid">Orderable</span> controls whether it can be added to an invoice. Click either pill to toggle it. Click a row to edit its details.{' '}
+        Both brands share one menu. Tick <strong>Filipino item</strong> and Tsismis shows it first; Love in My Tummy keeps it in its normal place.
+        Tick <strong>Featured</strong> for each brand to put an item on that brand's home page (4 or more looks best).{' '}
+        <strong>Feature on Homepage</strong> next to a category puts every item in it on both home pages.
       </p>
+
+      {archivedCount > 0 && (
+        <p className="prod-legend">
+          <button type="button" className="dash-btn dash-btn--ghost" onClick={() => setShowArchived((v) => !v)}>
+            {showArchived ? 'Back to the current menu' : `Show archived items (${archivedCount})`}
+          </button>{' '}
+          {showArchived && 'Archived items are kept for reference. They are hidden from the website and from invoices.'}
+        </p>
+      )}
 
       <datalist id="prod-category-options">
         {categoryOptions.map((c) => <option key={c} value={c} />)}
@@ -237,17 +260,10 @@ export default function Products() {
       {showForm && (
         <form className="dash-card" onSubmit={handleAdd} style={{ marginBottom: 24 }}>
           <div className="dash-form-grid">
-            <label className="dash-field">
-              <span>Brand</span>
-              <select value={form.brand_id} onChange={(e) => setForm({ ...form, brand_id: e.target.value })} className="prod-select">
-                <option value="limt">LIMT</option>
-                <option value="tsismis">Tsismis</option>
-              </select>
-            </label>
-            <label className="dash-field prod-checkbox-field" style={{ justifyContent: 'flex-end' }}>
+            <label className="dash-field prod-checkbox-field span-2">
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', fontWeight: 400, fontSize: '0.85rem' }}>
-                <input type="checkbox" checked={form.shown_both_brands} onChange={(e) => setForm({ ...form, shown_both_brands: e.target.checked })} />
-                Also sold under the other brand
+                <input type="checkbox" checked={form.is_filipino} onChange={(e) => setForm({ ...form, is_filipino: e.target.checked })} />
+                Filipino item (shown first on Tsismis)
               </label>
             </label>
             <label className="dash-field">
@@ -349,7 +365,7 @@ export default function Products() {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Brand</th>
+                  <th>Tags</th>
                   <th>Price</th>
                   <th>Allergens</th>
                   <th>Website</th>
@@ -362,10 +378,17 @@ export default function Products() {
                     <tr onClick={() => openEditor(p)}>
                       <td>
                         {p.name}
-                        {p.featured && <span className="prod-flag" title="Featured">★</span>}
+                        {(p.featured_limt || p.featured_tsismis) && (
+                          <span className="prod-flag" title={`Featured on ${[p.featured_limt && 'Love in My Tummy', p.featured_tsismis && 'Tsismis'].filter(Boolean).join(' and ')}`}>★</span>
+                        )}
                         {p.seasonal && <span className="prod-flag" title="Seasonal">❄</span>}
                       </td>
-                      <td>{BRAND_LABEL[p.brand_id] || p.brand_id}{p.shown_both_brands && <span className="prod-both-badge"> +Both</span>}</td>
+                      <td>
+                        <div className="prod-chip-row">
+                          {p.is_filipino && <span className="prod-chip">Filipino</span>}
+                          {p.is_placeholder && <span className="prod-chip" title="Sample item from the starter menu">Sample</span>}
+                        </div>
+                      </td>
                       <td>{p.base_price ? money(p.base_price) : '—'}</td>
                       <td>
                         {(p.allergens || []).length === 0 ? (
@@ -410,12 +433,9 @@ export default function Products() {
                                 placeholder="e.g. Celebration Cakes"
                               />
                             </label>
-                            <label className="dash-field">
-                              <span>Brand</span>
-                              <select className="prod-select" value={editForm.brand_id} onChange={(e) => setEditForm({ ...editForm, brand_id: e.target.value })}>
-                                <option value="limt">LIMT</option>
-                                <option value="tsismis">Tsismis</option>
-                              </select>
+                            <label className="dash-field prod-checkbox-field">
+                              <span>Filipino</span>
+                              <label><input type="checkbox" checked={editForm.is_filipino} onChange={(e) => setEditForm({ ...editForm, is_filipino: e.target.checked })} /> Filipino item (shown first on Tsismis)</label>
                             </label>
                             <label className="dash-field span-2">
                               <span>Description</span>
@@ -489,9 +509,9 @@ export default function Products() {
                             <div className="dash-field prod-checkbox-field">
                               <label><input type="checkbox" checked={editForm.pickup_available} onChange={(e) => setEditForm({ ...editForm, pickup_available: e.target.checked })} /> Pickup available</label>
                               <label><input type="checkbox" checked={editForm.delivery_available} onChange={(e) => setEditForm({ ...editForm, delivery_available: e.target.checked })} /> Delivery available</label>
-                              <label><input type="checkbox" checked={editForm.featured} onChange={(e) => setEditForm({ ...editForm, featured: e.target.checked })} /> Featured</label>
+                              <label><input type="checkbox" checked={editForm.featured_limt} onChange={(e) => setEditForm({ ...editForm, featured_limt: e.target.checked })} /> Featured on Love in My Tummy</label>
+                              <label><input type="checkbox" checked={editForm.featured_tsismis} onChange={(e) => setEditForm({ ...editForm, featured_tsismis: e.target.checked })} /> Featured on Tsismis</label>
                               <label><input type="checkbox" checked={editForm.seasonal} onChange={(e) => setEditForm({ ...editForm, seasonal: e.target.checked })} /> Seasonal</label>
-                              <label><input type="checkbox" checked={editForm.shown_both_brands} onChange={(e) => setEditForm({ ...editForm, shown_both_brands: e.target.checked })} /> Also sold under the other brand</label>
                             </div>
 
                             <label className="dash-field span-2">

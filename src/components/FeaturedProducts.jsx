@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabaseClient'
-import { money } from '../admin/invoiceMath'
+import { fetchMenu, featuredItems, priceLabel } from '../lib/menu'
 import { useBrand } from '../brand/BrandContext'
 import { brandPaths } from '../brand/brandPaths'
 import { brandContent } from '../brand/brandContent'
@@ -13,10 +12,9 @@ const MIN_ITEMS = 4
 const MAX_ITEMS = 8
 
 /*
-  The home page's featured menu. Shows items Carolyn has starred (the
-  "Featured" box on an item, or "Feature on Homepage" on a category) for
-  the active brand; if fewer than four are starred, tops up with the next
-  items on the menu so the row never looks empty.
+  The home page's featured menu. Shows the items Carolyn has starred for
+  the active brand (or a category set to "Feature on Homepage"); if fewer
+  than four are starred, tops up from the menu so the row never looks empty.
 */
 export default function FeaturedProducts() {
   const brand = useBrand()
@@ -26,21 +24,9 @@ export default function FeaturedProducts() {
 
   useEffect(() => {
     let cancelled = false
-    supabase
-      .from('products')
-      .select('id, name, description, base_price, price_type, image_url, category, featured, featured_category, brand_id, shown_both_brands, sort_order')
-      .eq('is_visible', true)
-      .or(`brand_id.eq.${brand.key},shown_both_brands.eq.true`)
-      .order('sort_order')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error || !data) return setItems([])
-        const starred = data.filter((p) => p.featured || p.featured_category)
-        const rest = data.filter((p) => !p.featured && !p.featured_category)
-        const picked = starred.slice(0, MAX_ITEMS)
-        if (picked.length < MIN_ITEMS) picked.push(...rest.slice(0, MIN_ITEMS - picked.length))
-        setItems(picked)
-      })
+    fetchMenu()
+      .then(({ products }) => !cancelled && setItems(featuredItems(products, brand.key, { min: MIN_ITEMS, max: MAX_ITEMS })))
+      .catch(() => !cancelled && setItems([]))
     return () => { cancelled = true }
   }, [brand.key])
 
@@ -77,7 +63,6 @@ function placeholderIcon(item, brandKey) {
 
 function ProductCard({ item, brandKey }) {
   const Icon = placeholderIcon(item, brandKey)
-  const hasPrice = item.base_price !== null && item.base_price !== undefined
 
   return (
     <li className="product-card">
@@ -93,9 +78,7 @@ function ProductCard({ item, brandKey }) {
       </div>
       <h3 className="product-card__name">{item.name}</h3>
       {item.description && <p className="product-card__desc">{item.description}</p>}
-      <p className="product-card__price">
-        {hasPrice ? `${item.price_type ? `${item.price_type} ` : ''}${money(item.base_price)}` : 'Price on request'}
-      </p>
+      <p className="product-card__price">{priceLabel(item)}</p>
     </li>
   )
 }

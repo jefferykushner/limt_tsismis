@@ -2,21 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useBrand } from '../brand/BrandContext'
 import { brandPaths } from '../brand/brandPaths'
-import { supabase } from '../lib/supabaseClient'
-import { money } from '../admin/invoiceMath'
+import { fetchMenu, menuSections, priceLabel } from '../lib/menu'
 import './MenuPage.css'
-
-/* One-line subtitles per category. A category not listed here simply has none. */
-const CATEGORY_SUBTITLE = {
-  'Celebration Cakes': 'Made to order for the moments worth celebrating.',
-  'Cupcakes & Mini Cakes': 'Individual-sized versions of your favourite flavours.',
-  'Cookies & Bars': 'Baked in small batches, always.',
-  'Filipino-Inspired Sweets': 'The flavours Carolyn grew up on, made with care.',
-  'Pastries & Breakfast Bakes': 'For slow mornings and quick ones alike.',
-  'Savoury Breads & Bakes': 'For when you want something other than sweet.',
-  'Cheesecakes, Tarts & Pies': 'Rich, creamy, and worth the fork fight.',
-  'Treat Boxes & Party Platters': 'Assorted favourites, ready to share.',
-}
 
 const INTRO = {
   limt: {
@@ -29,43 +16,24 @@ const INTRO = {
   },
 }
 
-const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-
-function buildSections(products, brandKey) {
-  const byCategory = new Map()
-  for (const item of products) {
-    if (item.brand_id !== brandKey && !item.shown_both_brands) continue
-    const cat = item.category || 'More'
-    if (!byCategory.has(cat)) byCategory.set(cat, [])
-    byCategory.get(cat).push(item)
-  }
-  return [...byCategory.entries()].map(([category, items]) => ({
-    id: slugify(category),
-    heading: category,
-    subtitle: CATEGORY_SUBTITLE[category] || null,
-    items,
-  }))
-}
-
-function tagsFor(item) {
+function tagsFor(item, brandKey) {
   const tags = []
-  if (item.featured) tags.push({ label: 'Favourite', kind: 'accent' })
+  // In Tsismis the Filipino items lead each section, so name them.
+  if (brandKey === 'tsismis' && item.is_filipino) tags.push({ label: 'Filipino favourite', kind: 'accent' })
   if (item.seasonal) tags.push({ label: 'Seasonal', kind: 'accent' })
   for (const t of item.dietary_tags || []) tags.push({ label: t, kind: 'plain' })
   return tags
 }
 
-function MenuItem({ item }) {
-  const tags = tagsFor(item)
+function MenuItem({ item, brandKey }) {
+  const tags = tagsFor(item, brandKey)
   const hasPrice = item.base_price !== null && item.base_price !== undefined
   return (
     <li className="menu-item">
       <div className="menu-item__head">
         <h3 className="menu-item__name">{item.name}</h3>
         <span className="menu-item__leader" aria-hidden="true" />
-        <span className={`menu-item__price ${hasPrice ? '' : 'is-muted'}`}>
-          {hasPrice ? `${item.price_type ? `${item.price_type} ` : ''}${money(item.base_price)}` : 'Price on request'}
-        </span>
+        <span className={`menu-item__price ${hasPrice ? '' : 'is-muted'}`}>{priceLabel(item)}</span>
       </div>
       {item.description && <p className="menu-item__desc">{item.description}</p>}
       {(tags.length > 0 || (item.allergens || []).length > 0) && (
@@ -86,26 +54,23 @@ export default function MenuPage() {
   const brand = useBrand()
   const paths = brandPaths(brand.key)
   const intro = INTRO[brand.key] ?? INTRO.limt
-  const [products, setProducts] = useState([])
+  const [menu, setMenu] = useState({ products: [], categories: [] })
   const [loading, setLoading] = useState(true)
   const [activeId, setActiveId] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    supabase
-      .from('products')
-      .select('*')
-      .eq('is_visible', true)
-      .order('sort_order')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (!error && data) setProducts(data)
-        setLoading(false)
-      })
+    fetchMenu()
+      .then((data) => !cancelled && setMenu(data))
+      .catch(() => {})
+      .finally(() => !cancelled && setLoading(false))
     return () => { cancelled = true }
   }, [])
 
-  const sections = useMemo(() => buildSections(products, brand.key), [products, brand.key])
+  const sections = useMemo(
+    () => menuSections(menu.products, menu.categories, brand.key),
+    [menu, brand.key]
+  )
 
   // Highlight the section in view in the jump bar.
   useEffect(() => {
@@ -158,7 +123,7 @@ export default function MenuPage() {
                 {section.subtitle && <p className="menu-section__subtitle">{section.subtitle}</p>}
               </div>
               <ul className="menu-section__items">
-                {section.items.map((item) => <MenuItem key={item.id} item={item} />)}
+                {section.items.map((item) => <MenuItem key={item.id} item={item} brandKey={brand.key} />)}
               </ul>
             </section>
           ))
