@@ -29,23 +29,26 @@ function MenuItem({ item, brandKey }) {
   const tags = tagsFor(item, brandKey)
   const hasPrice = item.base_price !== null && item.base_price !== undefined
   return (
-    <li className="menu-item">
-      <div className="menu-item__head">
-        <h3 className="menu-item__name">{item.name}</h3>
-        <span className="menu-item__leader" aria-hidden="true" />
-        <span className={`menu-item__price ${hasPrice ? '' : 'is-muted'}`}>{priceLabel(item)}</span>
+    <li className={`menu-item ${item.image_url ? 'has-photo' : ''}`}>
+      <div className="menu-item__text">
+        <div className="menu-item__head">
+          <h3 className="menu-item__name">{item.name}</h3>
+          <span className="menu-item__leader" aria-hidden="true" />
+          <span className={`menu-item__price ${hasPrice ? '' : 'is-muted'}`}>{priceLabel(item)}</span>
+        </div>
+        {item.description && <p className="menu-item__desc">{item.description}</p>}
+        {(tags.length > 0 || (item.allergens || []).length > 0) && (
+          <p className="menu-item__tags">
+            {tags.map((t) => (
+              <span key={t.label} className={`menu-tag menu-tag--${t.kind}`}>{t.label}</span>
+            ))}
+            {(item.allergens || []).length > 0 && (
+              <span className="menu-item__allergens">Contains: {item.allergens.join(', ')}</span>
+            )}
+          </p>
+        )}
       </div>
-      {item.description && <p className="menu-item__desc">{item.description}</p>}
-      {(tags.length > 0 || (item.allergens || []).length > 0) && (
-        <p className="menu-item__tags">
-          {tags.map((t) => (
-            <span key={t.label} className={`menu-tag menu-tag--${t.kind}`}>{t.label}</span>
-          ))}
-          {(item.allergens || []).length > 0 && (
-            <span className="menu-item__allergens">Contains: {item.allergens.join(', ')}</span>
-          )}
-        </p>
-      )}
+      {item.image_url && <img src={item.image_url} alt="" loading="lazy" className="menu-item__photo" width="96" height="96" />}
     </li>
   )
 }

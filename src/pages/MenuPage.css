@@ -55,6 +55,19 @@
 
 .menu-section__items { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
 
+.menu-item.has-photo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 20px;
+  align-items: start;
+}
+.menu-item__photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
 .menu-item__head {
   display: flex;
   align-items: baseline;
