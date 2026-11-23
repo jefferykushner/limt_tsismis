@@ -125,6 +125,7 @@
 .story__text .heading { margin-bottom: 20px; }
 .story__text p { max-width: 36em; color: var(--ink-soft); }
 .story__text p + p { margin-top: 16px; }
+.story__link { display: inline-block; margin-top: 20px; }
 .story__sig {
   font-family: var(--font-hand);
   font-size: 30px;

@@ -11,12 +11,12 @@ const COPY = {
   limt: {
     heading: "Let's make something lovely.",
     intro:
-      'Everything is baked to order in small batches, with real ingredients. Tell us what you have in mind and we will send you a quote.',
+      "A birthday, a thank-you, a Tuesday that needs rescuing. Tell us what you're craving and when, and we'll bake it fresh, just for you.",
     subject: 'Order request',
     steps: [
-      ['Browse the menu', 'Pick your favourites, or tell us about something custom.'],
-      ['Send us the details', 'What you would like, how many, and your pickup or delivery date.'],
-      ['Get your quote', 'We confirm the details and send a quote, usually within 24 hours.'],
+      ['Pick your favourites', 'From the menu, or tell us about the treat you can’t stop thinking about.'],
+      ['Send us the details', 'What you’d like, how many, and when you need it.'],
+      ['Get your quote', 'We’ll confirm everything and send a quote, usually within a day.'],
     ],
   },
   tsismis: {

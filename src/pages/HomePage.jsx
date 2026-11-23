@@ -86,6 +86,7 @@ export default function HomePage() {
             <h2 id="story-title" className="heading">{c.story.title}</h2>
             {c.story.paragraphs.map((para) => <p key={para.slice(0, 24)}>{para}</p>)}
             <p className="story__sig">{c.story.signature}</p>
+            <Link to={paths.about} className="text-link story__link">{c.story.link}</Link>
           </div>
         </div>
       </section>
@@ -117,7 +118,7 @@ function TsismisTeaser() {
           <h2 id="teaser-title" className="teaser__title">Psst. There’s another side to us.</h2>
           <p>
             Tsismis is our Filipino-inspired kitchen: ube, calamansi, leche flan and a lot more attitude.
-            Same Carolyn, same LG.
+            Same kitchen, same LG.
           </p>
         </div>
         <button type="button" className="teaser__button" onClick={(e) => switchBrand(e.currentTarget)}>

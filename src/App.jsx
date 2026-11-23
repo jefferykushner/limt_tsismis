@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage'
 import MenuPage from './pages/MenuPage'
 import Login from './pages/Login'
 import OrderPage from './pages/OrderPage'
+import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // LG's shared circle-breakout mechanic.
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
               <Route path="/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
               <Route path="/order" element={<PublicLayout><OrderPage /></PublicLayout>} />
+              <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
 
               {/* Tsismis — its own distinct shell, same MenuPage component
                   (it reads the active brand from BrandContext, which
@@ -50,6 +52,7 @@ export default function App() {
               <Route path="/tsismis" element={<PublicLayout><HomePage /></PublicLayout>} />
               <Route path="/tsismis/menu" element={<PublicLayout><MenuPage /></PublicLayout>} />
               <Route path="/tsismis/order" element={<PublicLayout><OrderPage /></PublicLayout>} />
+              <Route path="/tsismis/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
 
               <Route path="/login" element={<Login />} />
 

@@ -9,5 +9,6 @@ export function brandPaths(brandKey) {
     menu: `${base}/menu`,
     order: `${base}/order`,
     story: `${base || '/'}#story`,
+    about: `${base}/about`,
   }
 }

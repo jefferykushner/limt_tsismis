@@ -29,7 +29,7 @@ export default function Footer() {
           <h2 className="footer__title">Visit</h2>
           <ul>
             <li><Link to={paths.menu}>Menu</Link></li>
-            <li><Link to={paths.story}>Our story</Link></li>
+            <li><Link to={paths.about}>Our story</Link></li>
             <li><Link to={paths.order}>Order</Link></li>
             <li>
               <button type="button" className="footer__switch" onClick={(e) => switchBrand(e.currentTarget)}>

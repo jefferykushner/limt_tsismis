@@ -26,7 +26,7 @@ export default function Nav() {
   const links = (
     <>
       <li><NavLink to={paths.menu}>Menu</NavLink></li>
-      <li><Link to={paths.story}>Our story</Link></li>
+      <li><NavLink to={paths.about}>Our story</NavLink></li>
       <li><NavLink to={paths.order}>Order</NavLink></li>
     </>
   )

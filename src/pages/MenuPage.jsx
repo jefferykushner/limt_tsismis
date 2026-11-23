@@ -8,11 +8,11 @@ import './MenuPage.css'
 const INTRO = {
   limt: {
     title: 'The menu',
-    body: 'Everything is made to order in small batches. Prices are a starting point; custom sizes and flavours are always welcome.',
+    body: "Everything here is baked by hand, in small batches, when you order it. Prices are a starting point. Don't see your favourite? Ask us. We love a challenge.",
   },
   tsismis: {
     title: 'The goods',
-    body: "Filipino favourites first, everything else right behind. Made to order, so tell us what you're craving.",
+    body: "Filipino favourites first, everything else right behind. Baked fresh when you order, so tell us what you're craving. We won't tell anyone. (We'll tell everyone.)",
   },
 }
 
@@ -133,8 +133,8 @@ export default function MenuPage() {
         )}
 
         <aside className="menu-cta">
-          <h2 className="subheading">Something special in mind?</h2>
-          <p>Custom flavours, event platters and gift boxes are always welcome. Tell us what you’re planning.</p>
+          <h2 className="subheading">Dreaming of something that isn’t here?</h2>
+          <p>Custom flavours, party platters, gift boxes, your grandmother’s favourite reimagined. Tell us what you’re planning and we’ll make it happen.</p>
           <Link to={paths.order} className="button">Place an order</Link>
         </aside>
 

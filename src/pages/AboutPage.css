@@ -1,0 +1,95 @@
+.about__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: center;
+  padding-top: clamp(48px, 7vw, 96px);
+  padding-bottom: clamp(48px, 7vw, 96px);
+}
+
+.about__kicker {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.about__title { margin-bottom: 24px; }
+.about__lede { font-size: clamp(20px, 1.8vw, 24px); font-family: var(--font-serif); line-height: 1.45; color: var(--ink); }
+
+.about__portrait {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 6%;
+}
+.about__portrait .watercolour { inset: -8%; width: 116%; height: 116%; }
+
+.about__frame {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 380px);
+  aspect-ratio: 4 / 5;
+  border-radius: 999px 999px var(--radius) var(--radius);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.about__photo { width: 100%; height: 100%; object-fit: cover; }
+.about__art {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  color: var(--ink-soft);
+  margin-top: 18%;
+}
+.about__art svg:last-child { color: var(--accent); }
+
+.about__body {
+  display: grid;
+  gap: clamp(40px, 6vw, 72px);
+  padding-bottom: clamp(64px, 9vw, 120px);
+  max-width: calc(860px + 2 * var(--gutter));
+}
+
+.about__section {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.about__icon { color: var(--accent); margin-top: 8px; }
+.about__heading { font-size: clamp(30px, 3vw, 40px); margin-bottom: 16px; }
+.about__section p { color: var(--ink-soft); max-width: 38em; }
+.about__section p + p { margin-top: 14px; }
+
+.about__close { overflow: hidden; text-align: center; }
+.about__close-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+}
+.about__closing {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.3;
+  max-width: 24em;
+}
+.site[data-brand='tsismis'] .about__closing {
+  font-family: var(--font-hand);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .about__intro { grid-template-columns: 1fr; }
+  .about__portrait { max-width: 320px; margin: 0 auto; order: -1; }
+  .about__section { grid-template-columns: 1fr; gap: 8px; }
+}

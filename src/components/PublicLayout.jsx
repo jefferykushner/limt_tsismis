@@ -3,11 +3,11 @@ import { BrandSwitchProvider } from '../brand/BrandSwitch'
 import ScrollToHash from './ScrollToHash'
 import Nav from './Nav'
 import Footer from './Footer'
-import GossipTicker from './GossipTicker'
+import Ticker from './Ticker'
 import '../styles/site.css'
 import './art/art.css'
 
-/* Shell for every public page: brand skin, nav, Tsismis ticker, footer. */
+/* Shell for every public page: brand skin, nav, message ticker, footer. */
 export default function PublicLayout({ children }) {
   const brand = useBrand()
   return (
@@ -17,7 +17,7 @@ export default function PublicLayout({ children }) {
         <ScrollToHash />
         <Nav />
         <main id="main" className="site-main">
-          {brand.key === 'tsismis' && <GossipTicker />}
+          <Ticker brandKey={brand.key} />
           {children}
         </main>
         <Footer />
