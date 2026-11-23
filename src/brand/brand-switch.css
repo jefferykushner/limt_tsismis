@@ -1,5 +1,6 @@
 /* ── The switch button ─────────────────────────────────── */
 .brand-switch {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;

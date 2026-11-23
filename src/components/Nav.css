@@ -48,7 +48,7 @@
   gap: 12px;
 }
 
-.nav__order { min-height: 40px; padding: 0 20px; font-size: 15px; }
+.nav .nav__order { min-height: 40px; padding: 0 20px; font-size: 15px; white-space: nowrap; }
 
 .nav__toggle {
   display: none;
@@ -110,11 +110,11 @@
     /* hidden visually but still the button's accessible name */
     position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
   }
-  .nav__switch { padding: 0 5px; }
+  .nav__switch { padding: 0; width: 42px; justify-content: center; }
 }
 
 @media (max-width: 520px) {
-  .nav__order { display: none; }
+  .nav .nav__order { display: none; }
   .nav__logo-img--limt { height: 38px; }
   .nav__logo-img--tsismis { height: 18px; }
 }
