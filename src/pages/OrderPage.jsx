@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useBrand } from '../brand/BrandContext'
 import { brandPaths } from '../brand/brandPaths'
-import { brandContent } from '../brand/brandContent'
+import { LG } from '../components/LG'
 import Watercolour from '../components/art/Watercolour'
 import './OrderPage.css'
 
@@ -68,7 +68,7 @@ export default function OrderPage() {
 
         <div className="order-page__visual" aria-hidden="true">
           <Watercolour layout="story" seed={brand.key === 'tsismis' ? 17 : 15} />
-          <img src={brandContent(brand.key).avatar} alt="" className="order-page__lg" />
+          <LG pose="order" decorative className="order-page__lg" />
         </div>
       </div>
     </div>

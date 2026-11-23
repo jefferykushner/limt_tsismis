@@ -16,6 +16,9 @@
   gap: clamp(20px, 3vw, 36px) clamp(16px, 2.4vw, 28px);
 }
 
+.featured__title { display: flex; align-items: flex-end; gap: 16px; }
+.featured__lg { height: 132px; width: auto; margin-bottom: -6px; }
+
 .featured__empty { color: var(--muted); }
 
 .product-card { min-width: 0; }
@@ -76,4 +79,5 @@
 
 @media (max-width: 960px) {
   .featured__grid { grid-template-columns: repeat(2, 1fr); }
+  .featured__lg { height: 96px; }
 }

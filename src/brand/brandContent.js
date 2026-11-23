@@ -9,6 +9,7 @@ import tsismisWordmarkNav from '../assets/brand/tsismis-wordmark-nav.png'
 import tsismisWordmarkFull from '../assets/brand/tsismis-wordmark-full.png'
 import lgLimt from '../assets/lg-limt.png'
 import lgTsismis from '../assets/lg-tsismis.png'
+import limtHeroBrownies from '../assets/hero/limt-hero-brownies.webp'
 
 export const BRAND_CONTENT = {
   limt: {
@@ -25,7 +26,8 @@ export const BRAND_CONTENT = {
         "Fudgy brownies, gourmet cookies and a few surprises, made in small batches by Carolyn. If it says strawberry, there's real strawberry in it.",
       primary: 'See the menu',
       secondary: 'Place an order',
-      imageAlt: 'A stack of fudgy chocolate brownies',
+      image: limtHeroBrownies,
+      imageAlt: 'A stack of five fudgy chocolate brownies with flaky salt, the top one broken open',
     },
 
     promises: [
@@ -59,7 +61,6 @@ export const BRAND_CONTENT = {
         'Carolyn bakes because she loves it. She gets excited every time someone asks for their favourite, and she usually finds a way to make it a little more special. Nothing is ever too much of anything; every bake is in balance.',
       ],
       signature: 'Carolyn',
-      imageAlt: 'LG, winking and hugging a striped blanket',
     },
 
     order: {
@@ -96,7 +97,6 @@ export const BRAND_CONTENT = {
         "Ube, calamansi, leche flan and pandan, made the way Carolyn grew up eating them. Real ingredients, small batches, and a lot of talking about it afterwards.",
       primary: 'See the goods',
       secondary: 'Spill your order',
-      imageAlt: 'Filipino-inspired treats',
     },
 
     promises: [
@@ -130,7 +130,6 @@ export const BRAND_CONTENT = {
         'If Love in My Tummy is a warm hug, Tsismis is the friend who leans in and tells you the good stuff first. Everything is still handmade, to order. We just talk about it differently.',
       ],
       signature: 'LG, allegedly',
-      imageAlt: 'LG with a finger to her lips',
     },
 
     tags: [

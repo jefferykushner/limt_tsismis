@@ -5,6 +5,7 @@ import { useBrand } from '../brand/BrandContext'
 import { brandPaths } from '../brand/brandPaths'
 import { brandContent } from '../brand/brandContent'
 import Watercolour from './art/Watercolour'
+import { LG } from './LG'
 import { Cookie, WarmBrownie, Heart, Sun } from './art/LineArt'
 import './FeaturedProducts.css'
 
@@ -34,7 +35,10 @@ export default function FeaturedProducts() {
     <section className="band featured" aria-labelledby="featured-title">
       <div className="wrap">
         <div className="featured__head">
-          <h2 id="featured-title" className="heading">{content.featured.title}</h2>
+          <div className="featured__title">
+            <LG pose="featured" fallback={false} decorative className="featured__lg" />
+            <h2 id="featured-title" className="heading">{content.featured.title}</h2>
+          </div>
           <Link to={paths.menu} className="text-link">{content.featured.link}</Link>
         </div>
 

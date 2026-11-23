@@ -10,8 +10,10 @@
 }
 
 .not-found__lg {
-  width: 168px;
-  height: auto;
+  width: auto;
+  height: 240px;
+  max-width: 80vw;
+  object-fit: contain;
   margin-bottom: 8px;
 }
 

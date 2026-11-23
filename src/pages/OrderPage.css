@@ -68,8 +68,10 @@
 .order-page__lg {
   position: relative;
   z-index: 1;
-  width: min(100%, 360px);
-  height: auto;
+  width: auto;
+  height: clamp(300px, 36vw, 460px);
+  max-width: 100%;
+  object-fit: contain;
 }
 
 @media (max-width: 860px) {

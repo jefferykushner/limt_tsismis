@@ -6,20 +6,22 @@ import { useBrandSwitch } from '../brand/BrandSwitch'
 import Watercolour from '../components/art/Watercolour'
 import { BrownieStack, MixingBowl, Strawberry, WarmBrownie, Sun, SpeechBubble } from '../components/art/LineArt'
 import FeaturedProducts from '../components/FeaturedProducts'
+import { LG, useHasPose } from '../components/LG'
 import './HomePage.css'
 
 const PROMISE_ICONS = { strawberry: Strawberry, bowl: MixingBowl, warm: WarmBrownie }
 
 /*
   One home page for both brands. Layout is identical; words, colours, logo
-  and LG come from the active brand. The hero image slot shows a line
-  drawing until a hero photo is set (Phase 3 adds that control to the admin).
+  and LG come from the active brand. LIMT's hero arch holds the hero photo;
+  Tsismis's holds LG whispering. (Phase 3 lets Carolyn change these.)
 */
 export default function HomePage() {
   const brand = useBrand()
   const c = brandContent(brand.key)
   const paths = brandPaths(brand.key)
   const isTsismis = brand.key === 'tsismis'
+  const heroPose = useHasPose('hero')
 
   return (
     <>
@@ -38,14 +40,16 @@ export default function HomePage() {
 
           <div className="hero__art">
             <Watercolour layout="hero" seed={isTsismis ? 7 : 3} />
-            <div className="hero__arch">
+            <div className={`hero__arch ${c.hero.image ? '' : 'hero__arch--figure'}`}>
               {c.hero.image ? (
-                <img src={c.hero.image} alt={c.hero.imageAlt} className="hero__photo" />
+                <img src={c.hero.image} alt={c.hero.imageAlt} className="hero__photo" fetchPriority="high" />
+              ) : heroPose ? (
+                <LG pose="hero" className="hero__figure" loading="eager" />
               ) : (
                 <BrownieStack className="hero__drawing" />
               )}
             </div>
-            <img src={c.avatar} alt="" className="hero__lg" width="132" height="132" />
+            {c.hero.image && <img src={c.avatar} alt="" className="hero__lg" width="132" height="132" />}
             {isTsismis && <Sun size={56} className="hero__sun" />}
           </div>
         </div>
@@ -76,7 +80,7 @@ export default function HomePage() {
         <div className="wrap story__grid">
           <div className="story__art">
             <Watercolour layout="story" seed={isTsismis ? 11 : 5} />
-            <img src={c.avatar} alt={c.story.imageAlt} className="story__lg" />
+            <LG pose="story" className="story__lg" />
           </div>
           <div className="story__text">
             <h2 id="story-title" className="heading">{c.story.title}</h2>
