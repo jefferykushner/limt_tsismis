@@ -1,0 +1,78 @@
+.order-page {
+  padding: clamp(48px, 8vw, 104px) 0 clamp(64px, 10vw, 120px);
+}
+
+.order-page__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: center;
+}
+
+.order-page__heading { margin-bottom: 20px; font-size: clamp(44px, 5.4vw, 72px); }
+.order-page__intro { margin-bottom: 40px; }
+
+.order-page__steps {
+  list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
+  display: grid;
+  gap: 22px;
+}
+
+.order-page__step {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+/* These are real steps in order, so they keep their numbers. */
+.order-page__num {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.order-page__step-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 23px;
+  line-height: 1.25;
+}
+.order-page__step-desc { color: var(--muted); }
+
+.order-page__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.order-page__note { font-size: 15px; color: var(--muted); }
+.order-page__note a { color: var(--accent); }
+
+.order-page__visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 10%;
+}
+.order-page__lg {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 360px);
+  height: auto;
+}
+
+@media (max-width: 860px) {
+  .order-page__inner { grid-template-columns: 1fr; }
+  .order-page__visual { order: -1; max-width: 280px; margin: 0 auto; }
+}

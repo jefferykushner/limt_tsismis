@@ -1,0 +1,29 @@
+.not-found {
+  min-height: 64vh;
+  padding: 64px var(--gutter) 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.not-found__lg {
+  width: 168px;
+  height: auto;
+  margin-bottom: 8px;
+}
+
+.not-found__body {
+  color: var(--muted);
+  max-width: 32em;
+}
+
+.not-found__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
+}

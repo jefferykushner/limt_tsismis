@@ -1,16 +1,51 @@
-# React + Vite
+# Love in My Tummy × Tsismis
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website and back office for **Love in My Tummy Artisan Sweets**, Carolyn's small-batch bakery, and its Filipino-inspired sister brand **Tsismis**. The public site can switch between the two brands; the back office handles clients, quotes, invoices and the product catalog.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Front end:** React 19 + Vite, React Router
+- **Data and logins:** Supabase (project `bakedCRM`)
+- **Hosting:** Netlify (`limt-tsismis`), built from `main`
 
-## React Compiler
+## Running it locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+cp .env.example .env   # then fill in the two Supabase values
+npm run dev
+```
 
-## Expanding the ESLint configuration
+The site needs two environment variables, set in `.env` locally and in Netlify's site settings for deploys:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Variable | Where to find it |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Supabase → Project Settings → API |
+| `VITE_SUPABASE_ANON_KEY` | Supabase → Project Settings → API (the public "anon" key) |
+
+## Where things live
+
+| Path | What it is |
+| --- | --- |
+| `src/pages/` | Public pages: home (LIMT and Tsismis), menu, order, login, not found |
+| `src/brand/` | Brand switching: `BrandContext` (reads `/tsismis` from the URL), `brandPaths`, LG pose registry |
+| `src/components/` | Nav, footer, the `LG` mascot component, featured collections |
+| `src/admin/` | Back office: clients, orders/invoices, products, printable invoice |
+| `src/account/` | Customer portal: a client's own orders |
+| `src/styles/tokens.css` | Colours, type, spacing and shared button styles |
+| `supabase/migrations/` | Database changes, in the order they were applied |
+
+## Routes
+
+| URL | Page |
+| --- | --- |
+| `/`, `/tsismis` | Home page for each brand |
+| `/menu`, `/tsismis/menu` | Menu |
+| `/order`, `/tsismis/order` | How to order |
+| `/login` | Staff and client login |
+| `/admin/...` | Back office (staff only) |
+| `/account/...` | Customer portal (signed-in clients) |
+
+## Working on it
+
+Changes go on a branch and into `main` through a pull request, so Netlify builds a preview to check before anything goes live. Database changes are saved as SQL files in `supabase/migrations/` with the date they were applied.
