@@ -48,21 +48,19 @@ export default function Watercolour({ layout = 'hero', className = '', seed = 3 
       <defs>
         <filter id={`bleed-${id}`} x="-30%" y="-30%" width="160%" height="160%">
           <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed={seed} result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G" result="warped" />
-          <feGaussianBlur in="warped" stdDeviation="2.2" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G" result="warped" />
+          <feGaussianBlur in="warped" stdDeviation="0.9" />
         </filter>
       </defs>
       <g filter={`url(#bleed-${id})`}>
         {blooms.map((b, i) => (
-          <ellipse
-            key={i}
-            cx={b.cx}
-            cy={b.cy}
-            rx={b.rx}
-            ry={b.ry}
-            fill={`var(--wash-${b.c})`}
-            opacity={b.o}
-          />
+          <g key={i} opacity={b.o}>
+            {/* the wash itself, lighter towards the middle */}
+            <ellipse cx={b.cx} cy={b.cy} rx={b.rx} ry={b.ry} fill={`var(--wash-${b.c})`} opacity="0.7" />
+            <ellipse cx={b.cx - b.rx * 0.3} cy={b.cy + b.ry * 0.2} rx={b.rx * 0.55} ry={b.ry * 0.5} fill={`var(--wash-${b.c})`} opacity="0.4" />
+            {/* pigment pooling at the drying edge */}
+            <ellipse cx={b.cx} cy={b.cy} rx={b.rx} ry={b.ry} fill="none" stroke={`var(--wash-${b.c})`} strokeWidth="1.1" opacity="1" />
+          </g>
         ))}
       </g>
     </svg>

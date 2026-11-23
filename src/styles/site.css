@@ -70,7 +70,8 @@
   border-radius: 4px;
 }
 
-.site a { color: inherit; }
+/* zero specificity, so classes like .button can set their own colour */
+:where(.site) a { color: inherit; }
 
 .skip-link {
   position: absolute;

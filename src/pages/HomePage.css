@@ -15,7 +15,8 @@
 
 .hero__title {
   margin-bottom: 24px;
-  max-width: 11ch;
+  max-width: 14ch;
+  font-size: clamp(44px, 5.4vw, 76px);
   text-wrap: balance;
 }
 

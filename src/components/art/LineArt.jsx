@@ -99,11 +99,25 @@ export function SpeechBubble(props) {
   )
 }
 
-/* A larger drawing for the hero, used until a product photo is uploaded. */
+/* One square brownie drawn in light perspective: crackly top, fudgy front. */
+function BrowniePiece({ x, y, rot = 0, w = 92, h = 38, d = 12 }) {
+  return (
+    <g transform={`rotate(${rot} ${x + w / 2} ${y + h / 2})`}>
+      <path d={`M${x} ${y}l${d} ${-d}h${w}l${-d} ${d}z`} />
+      <path d={`M${x} ${y}h${w}v${h}h${-w}z`} />
+      <path d={`M${x + w} ${y}l${d} ${-d}v${h}l${-d} ${d}`} />
+      <path d={`M${x + 8} ${y - 5}c10-3 14 3 24 0s14-4 22-1 12 3 18 0`} opacity="0.7" />
+      <path d={`M${x + 12} ${y + 14}h1M${x + 34} ${y + 24}h1M${x + 58} ${y + 12}h1M${x + 76} ${y + 27}h1`} strokeWidth="2.4" opacity="0.45" />
+    </g>
+  )
+}
+
+/* A larger drawing for the hero, used until a product photo is uploaded:
+   a little pile of fudgy brownies on a plate, the top one broken open. */
 export function BrownieStack({ className = '' }) {
   return (
     <svg
-      viewBox="0 0 320 260"
+      viewBox="0 0 320 250"
       className={`line-art ${className}`}
       fill="none"
       stroke="currentColor"
@@ -114,25 +128,33 @@ export function BrownieStack({ className = '' }) {
       focusable="false"
     >
       {/* plate */}
-      <ellipse cx="160" cy="212" rx="128" ry="26" />
-      <path d="M58 214c18 10 60 16 102 16s84-6 102-16" opacity="0.6" />
-      {/* bottom brownie */}
-      <path d="M84 196v-34l70-14 82 16v34l-82 14z" />
-      <path d="M84 162l70 16 82-14M154 178v32" />
-      <path d="M92 166c14 5 24-2 36 4 12 6 18 0 26 4" opacity="0.7" />
-      {/* middle brownie, turned */}
-      <path d="M100 146v-30l64-18 70 18v30l-70 18z" />
-      <path d="M100 116l64 18 70-18M164 134v30" />
-      <path d="M170 112c10-4 18 2 28-1s14 2 22 0" opacity="0.7" />
-      {/* top brownie, broken to show the fudgy middle */}
-      <path d="M118 96V72l46-12 26 7-8 10 6 8-4 9 6 9-26 5z" />
-      <path d="M118 72l46 12M164 84v28" />
-      <path d="M196 70l32-8 30 9v22l-30 8-26-5" />
-      <path d="M196 70l30 9 32-8M226 79v22" />
-      <path d="M186 88c3 1 4 4 2 6M190 76c2 1 3 3 1 5" opacity="0.7" />
-      {/* crumbs and salt */}
-      <path d="M62 236l3-2M268 230l4 1M246 240l2 2M80 226l-2 3" />
-      <path d="M142 64l2-2M176 58l2 1M154 56l1 2" opacity="0.8" />
+      <path d="M34 214c0 12 56 21 126 21s126-9 126-21" />
+      <path d="M34 214c0-8 56-15 126-15s126 7 126 15" opacity="0.5" />
+
+      {/* bottom row */}
+      <BrowniePiece x={58} y={166} />
+      <BrowniePiece x={166} y={168} rot={2} />
+      {/* middle */}
+      <BrowniePiece x={104} y={116} rot={-4} />
+
+      {/* top brownie, broken in two to show the fudgy middle */}
+      <g transform="rotate(6 160 80)">
+        <path d="M112 74l10-10h34l-5 10z" />
+        <path d="M112 74h39l-4 8 5 7-4 8 4 7h-40z" />
+        <path d="M120 69c8-2 12 2 20 0" opacity="0.7" />
+      </g>
+      <g transform="rotate(-8 200 70)">
+        <path d="M176 66l10-10h40l-10 10z" />
+        <path d="M176 66h40v38h-36l-4-7 5-8-4-7 4-8z" />
+        <path d="M216 66l10-10v38l-10 10" />
+        <path d="M184 61c8-2 12 2 20 0s8 2 12 0" opacity="0.7" />
+      </g>
+      {/* gooey strands across the break */}
+      <path d="M156 84c6-2 11-2 17-6M157 98c6 0 11-2 17-5" opacity="0.65" />
+
+      {/* flaky salt and crumbs */}
+      <path d="M128 58l2-3M196 46l3-1M210 50l1 3M142 60l2 2" />
+      <path d="M60 226l3-1M262 228l4 1M248 232l2 2M90 232l-2 2M150 208l2 1" opacity="0.8" />
     </svg>
   )
 }
