@@ -10,7 +10,7 @@ const BrandContext = createContext(BRANDS.limt);
 
 /**
  * Resolves the active brand from the URL path and:
- *  - sets data-brand on <html> so theme CSS (limt.theme.css / tsismis.theme.css) applies
+ *  - sets data-brand on <html> so CSS can style each brand with [data-brand='tsismis']
  *  - remembers the choice in localStorage so "/" can redirect a returning visitor
  *    straight to their last brand instead of a neutral picker every time
  *

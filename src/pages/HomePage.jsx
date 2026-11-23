@@ -37,7 +37,7 @@ export default function HomePage() {
           </p>
           <div className="hp-hero__actions">
             <Link to="/menu" className="btn btn--filled">See What's Baking</Link>
-            <Link to="/story" className="btn btn--outline">Meet LG</Link>
+            <Link to="/#story" className="btn btn--outline">Meet LG</Link>
           </div>
         </div>
 

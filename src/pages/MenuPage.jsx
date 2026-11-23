@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { brandPaths } from '../brand/brandPaths'
 import { useRevealAll } from '../hooks/useReveal'
 import { useBrand } from '../brand/BrandContext'
 import { supabase } from '../lib/supabaseClient'
@@ -83,9 +85,9 @@ function OrderCTA({ brand }) {
           ? 'Celebrate with a custom cake, gift box, or event order. We would love to make something just for you.'
           : "Custom meryenda spreads, pasalubong stations, and event catering. Tell us what you're planning and we'll make it happen."}
       </p>
-      <a href="/order" className={`btn ${isLimt ? 'btn--blush' : 'btn--ube'}`}>
+      <Link to={brandPaths(brand).order} className={`btn ${isLimt ? 'btn--blush' : 'btn--ube'}`}>
         {isLimt ? 'Request a Quote' : 'Get in Touch'}
-      </a>
+      </Link>
     </div>
   )
 }

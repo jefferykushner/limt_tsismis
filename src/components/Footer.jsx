@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
+import { useBrand } from '../brand/BrandContext'
+import { brandPaths } from '../brand/brandPaths'
 import './Footer.css'
 
 export default function Footer() {
+  const paths = brandPaths(useBrand().key)
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -20,11 +23,11 @@ export default function Footer() {
           <div className="footer__col">
             <p className="footer__col-title">Navigate</p>
             <ul className="footer__col-links">
-              <li><Link to="/menu">Menu</Link></li>
+              <li><Link to={paths.menu}>Menu</Link></li>
+              <li><Link to="/">Love in My Tummy</Link></li>
               <li><Link to="/tsismis">Tsismis</Link></li>
-              <li><Link to="/shop">LG Shop</Link></li>
-              <li><Link to="/story">Our Story</Link></li>
-              <li><Link to="/order">Order Now</Link></li>
+              <li><Link to={paths.story}>Our Story</Link></li>
+              <li><Link to={paths.order}>Order Now</Link></li>
             </ul>
           </div>
 

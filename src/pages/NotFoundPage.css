@@ -1,0 +1,37 @@
+.not-found {
+  min-height: 70vh;
+  padding: calc(var(--nav-h) + 60px) var(--gutter) 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-md);
+}
+
+.not-found__lg {
+  width: 180px;
+  margin-bottom: var(--space-md);
+}
+
+.not-found__heading {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.15;
+}
+.not-found__heading em { color: var(--blush-dk); }
+[data-brand='tsismis'] .not-found__heading em { color: var(--ube); }
+
+.not-found__body {
+  color: var(--graphite);
+  max-width: 32em;
+}
+
+.not-found__actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-md);
+}
