@@ -1,52 +1,70 @@
-import { createContext, useContext, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const BRANDS = {
-  limt: { key: 'limt', label: 'Love in My Tummy', path: '/limt' },
+  limt: { key: 'limt', label: 'Love in My Tummy', path: '/' },
   tsismis: { key: 'tsismis', label: 'Tsismis', path: '/tsismis' },
-};
+}
 
-const BrandContext = createContext(BRANDS.limt);
+const CHOICE_KEY = 'limt:brandChoice'
+const BrandContext = createContext(BRANDS.limt)
+
+/** The same page in the other brand: /menu <-> /tsismis/menu, / <-> /tsismis */
+export function counterpartPath(pathname, fromKey) {
+  if (fromKey === 'tsismis') {
+    return pathname.replace(/^\/tsismis(?=\/|$)/, '') || '/'
+  }
+  return pathname === '/' ? '/tsismis' : `/tsismis${pathname}`
+}
+
+/** Remember an explicit choice made with the brand switch. */
+export function rememberBrandChoice(key) {
+  try {
+    window.localStorage.setItem(CHOICE_KEY, key)
+  } catch {
+    // storage unavailable (private browsing etc.): the switch still works, it just isn't remembered
+  }
+}
+
+function readBrandChoice() {
+  try {
+    return window.localStorage.getItem(CHOICE_KEY)
+  } catch {
+    return null
+  }
+}
 
 /**
- * Resolves the active brand from the URL path and:
- *  - sets data-brand on <html> so theme CSS (limt.theme.css / tsismis.theme.css) applies
- *  - remembers the choice in localStorage so "/" can redirect a returning visitor
- *    straight to their last brand instead of a neutral picker every time
- *
- * Wrap this INSIDE your Router (it needs useLocation), and OUTSIDE the routes
- * that render brand-specific pages.
+ * Resolves the active brand from the URL (/tsismis prefix = Tsismis) and
+ * sets data-brand on <html>. On the very first page load only, a visitor who
+ * last chose Tsismis with the switch and lands on "/" is sent to /tsismis.
+ * Links shared directly to either brand always open that brand.
  */
 export function BrandProvider({ children }) {
-  const location = useLocation();
+  const location = useLocation()
+  const navigate = useNavigate()
+  const firstLoad = useRef(true)
 
-  const brand = useMemo(() => {
-    if (location.pathname.startsWith(BRANDS.tsismis.path)) return BRANDS.tsismis;
-    return BRANDS.limt;
-  }, [location.pathname]);
+  const brand = useMemo(
+    () => (/^\/tsismis(\/|$)/.test(location.pathname) ? BRANDS.tsismis : BRANDS.limt),
+    [location.pathname]
+  )
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-brand', brand.key);
-    try {
-      window.localStorage.setItem('bakedgoods:lastBrand', brand.key);
-    } catch {
-      // localStorage unavailable (private browsing, etc.) — non-fatal, just skip remembering
+    if (!firstLoad.current) return
+    firstLoad.current = false
+    if (location.pathname === '/' && !location.hash && readBrandChoice() === 'tsismis') {
+      navigate('/tsismis', { replace: true })
     }
-  }, [brand.key]);
+  }, [location.pathname, location.hash, navigate])
 
-  return <BrandContext.Provider value={brand}>{children}</BrandContext.Provider>;
+  useEffect(() => {
+    document.documentElement.setAttribute('data-brand', brand.key)
+  }, [brand.key])
+
+  return <BrandContext.Provider value={brand}>{children}</BrandContext.Provider>
 }
 
 export function useBrand() {
-  return useContext(BrandContext);
-}
-
-/** Read the last-visited brand for the "/" landing redirect. Defaults to null (show picker). */
-export function getLastVisitedBrand() {
-  try {
-    const stored = window.localStorage.getItem('bakedgoods:lastBrand');
-    return stored && BRANDS[stored] ? BRANDS[stored] : null;
-  } catch {
-    return null;
-  }
+  return useContext(BrandContext)
 }

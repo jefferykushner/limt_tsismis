@@ -5,14 +5,13 @@
   Rewritten to use the site's real design tokens (tokens.css) instead of the
   earlier [data-brand]-scoped variable system, which never matched how the
   rest of the site actually themes things (brand-suffix classes like
-  .dash--tsismis, .menu-item--tsismis). That system has been retired —
-  delete limt.theme.css and tsismis.theme.css from /src/brand.
+  .dash--tsismis, .menu-item--tsismis).
 */
 
 .lg-mascot {
   display: block;
   max-width: 100%;
-  height: auto;
+  /* each placement sets its own height (width follows), so no height here */
 }
 
 /* Standard breakout: used in hero sections, how-it-works cards, sidebar
