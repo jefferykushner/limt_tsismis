@@ -8,15 +8,14 @@ Original LG images supplied by Jeffery on 25 Nov 2026, cut from his pose sheets 
 - `photo/`: single poses in the photographic style, 19 cut from two sheets plus one stand-alone image.
 - `stickers/`: 30 single stickers in the pink birthday style, cut from the sticker sheet on a grid. Some edges include a sliver of the next sticker; the cut-out step removes it.
 
-## Three styles: where each fits
+## Styles
 
-| Style | Files | Best use |
+As of 25 Nov 2026, **LG is photographic**. The photo poses here are the reference for her look, and future LG images are generated in this style. The hand-drawn LG on the site (batches 1–2) will be replaced by batch 3. The logos stay illustrated.
+
+| Style | Files | Use |
 | --- | --- | --- |
-| Hand-drawn watercolour (logos, batches 1–2) | `src/assets/lg/` | The site's main voice, used in both brands |
-| Photographic, ivory dress | `photo/` | Playful accents: the About page, empty states, 404, "added to order" moments, Tsismis peeking and secret gags |
-| Glossy pink stickers | `stickers/` | A birthday and celebration orders section, promos, the ticker, social posts. Not for the main pages, where the pink outfits clash with LG's ivory dress |
-
-Use one style per section so the site doesn't feel mixed.
+| Photographic, ivory dress | `photo/` | LG everywhere on the site, and the reference for new images |
+| Glossy pink stickers | `stickers/` | Only for a birthday and celebration orders section, promos, the ticker and social posts. Their pink outfits differ from LG's ivory dress, so keep them out of the main pages. |
 
 ## Resolution
 
