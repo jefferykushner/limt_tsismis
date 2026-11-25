@@ -10,8 +10,8 @@ import limtWordmarkNav from '../assets/brand/limt-wordmark-nav.png'
 import limtWordmarkFull from '../assets/brand/limt-wordmark-full.png'
 import tsismisWordmarkNav from '../assets/brand/tsismis-wordmark-nav.png'
 import tsismisWordmarkFull from '../assets/brand/tsismis-wordmark-full.png'
-import lgLimt from '../assets/lg-limt.png'
-import lgTsismis from '../assets/lg-tsismis.png'
+import lgLimt from '../assets/lg/limt/lg-limt-portrait.webp'
+import lgTsismis from '../assets/lg/tsismis/lg-tsismis-portrait.webp'
 import limtHeroBrownies from '../assets/hero/limt-hero-brownies.webp'
 
 export const BRAND_CONTENT = {
@@ -176,6 +176,13 @@ export const BRAND_CONTENT = {
       ],
       signature: 'LG, allegedly',
       link: 'Get the full story',
+    },
+
+    // The see no / hear no / speak no row above the gossip tags (Tsismis only)
+    noTsismis: {
+      title: 'We have a strict no-tsismis policy.',
+      lines: ['See no tsismis.', 'Hear no tsismis.', 'Speak no tsismis.'],
+      punchline: 'We lasted about four seconds.',
     },
 
     tags: [

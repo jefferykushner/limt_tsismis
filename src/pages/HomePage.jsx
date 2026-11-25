@@ -91,6 +91,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {isTsismis && <NoTsismis copy={c.noTsismis} />}
       {isTsismis ? <GossipTags tags={c.tags} /> : <TsismisTeaser />}
 
       {/* ── Order ────────────────────────────────────────── */}
@@ -125,6 +126,29 @@ function TsismisTeaser() {
           <SpeechBubble size={24} />
           Switch to Tsismis
         </button>
+      </div>
+    </section>
+  )
+}
+
+/* Tsismis only: LG's see no / hear no / speak no tsismis trio. */
+const NO_TSISMIS_POSES = ['seeNo', 'hearNo', 'speakNo']
+
+function NoTsismis({ copy }) {
+  if (!copy) return null
+  return (
+    <section className="no-tsismis" aria-labelledby="no-tsismis-title">
+      <div className="wrap">
+        <h2 id="no-tsismis-title" className="heading no-tsismis__title">{copy.title}</h2>
+        <ul className="no-tsismis__row">
+          {NO_TSISMIS_POSES.map((pose, i) => (
+            <li key={pose} className="no-tsismis__item">
+              <LG pose={pose} fallback={false} decorative className="no-tsismis__lg" />
+              <p className="no-tsismis__line">{copy.lines[i]}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="whisper no-tsismis__punchline">{copy.punchline}</p>
       </div>
     </section>
   )

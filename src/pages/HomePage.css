@@ -180,6 +180,29 @@
 .teaser__button:hover { background: #244B8C; }
 
 /* ── Gossip tags (Tsismis only) ────────────────────────── */
+/* ── See no / hear no / speak no tsismis (Tsismis only) ── */
+.no-tsismis { padding: clamp(48px, 7vw, 96px) 0 0; text-align: center; }
+.no-tsismis__title { margin: 0 0 clamp(24px, 4vw, 40px); }
+.no-tsismis__row {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 3vw, 40px);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0;
+}
+.no-tsismis__item { display: flex; flex-direction: column; align-items: center; }
+.no-tsismis__lg { height: clamp(150px, 22vw, 260px); width: auto; max-width: 100%; }
+.no-tsismis__line {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 600;
+  color: #C8323B;
+  margin: 12px 0 0;
+}
+.no-tsismis__punchline { margin: clamp(16px, 3vw, 28px) 0 0; justify-content: center; }
+
 .tags { padding: clamp(48px, 7vw, 96px) 0; overflow: hidden; }
 .tags__row {
   list-style: none;
@@ -248,6 +271,8 @@
 }
 
 @media (max-width: 520px) {
+  .no-tsismis__row { gap: 8px; }
+  .no-tsismis__line { font-size: 19px; }
   .tags__row { grid-template-columns: 1fr; max-width: 300px; }
   .tag:nth-child(even) { transform: rotate(2deg); }
 }
