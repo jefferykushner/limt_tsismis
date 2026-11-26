@@ -1,0 +1,111 @@
+/* ── The switch button ─────────────────────────────────── */
+.brand-switch {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 5px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-hand);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.brand-switch:hover { transform: translateY(-1px); }
+
+/* Going TO Tsismis: a sunny pill in Tsismis colours, so it previews the switch */
+.brand-switch--to-tsismis {
+  background: #FCF0D6;
+  border-color: #F2C94C;
+  color: #1E2B4A;
+}
+.brand-switch--to-tsismis:hover { box-shadow: 0 0 0 4px rgba(242, 201, 76, 0.35); }
+
+/* Going back TO Love in My Tummy: a blush pill in LIMT colours */
+.brand-switch--to-limt {
+  background: #FBF7F2;
+  border-color: #D79CA3;
+  color: #3B2A24;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 17px;
+  font-weight: 600;
+}
+.brand-switch--to-limt:hover { box-shadow: 0 0 0 4px rgba(215, 156, 163, 0.3); }
+
+.brand-switch__lg {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+}
+
+/* ── The colour wipe ───────────────────────────────────── */
+.brand-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  clip-path: circle(0 at var(--x) var(--y));
+  animation: brand-wipe-cover 420ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.brand-wipe--tsismis {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(242, 201, 76, 0.55), transparent 55%),
+    radial-gradient(circle at 75% 70%, rgba(200, 50, 59, 0.35), transparent 50%),
+    #2F5DA8;
+  color: #FFFAF1;
+}
+.brand-wipe--limt {
+  background:
+    radial-gradient(circle at 30% 35%, rgba(242, 211, 196, 0.9), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(220, 229, 218, 0.9), transparent 50%),
+    #F6E4E6;
+  color: #3B2A24;
+}
+
+.brand-wipe__word {
+  opacity: 0;
+  animation: brand-wipe-word 420ms ease 160ms forwards;
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 1;
+}
+.brand-wipe--tsismis .brand-wipe__word { font-family: 'Caveat', cursive; font-weight: 600; }
+.brand-wipe--limt .brand-wipe__word { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; }
+
+.brand-wipe.is-reveal {
+  clip-path: circle(150% at var(--x) var(--y));
+  animation: brand-wipe-reveal 380ms ease forwards;
+}
+
+@keyframes brand-wipe-cover {
+  to { clip-path: circle(150% at var(--x) var(--y)); }
+}
+@keyframes brand-wipe-reveal {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes brand-wipe-word {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Reduced motion: no growing circle, just a short fade */
+.brand-wipe.is-reduced {
+  clip-path: none;
+  animation: brand-wipe-fade-in 120ms ease forwards;
+}
+.brand-wipe.is-reduced .brand-wipe__word { display: none; }
+.brand-wipe.is-reduced.is-reveal { animation: brand-wipe-reveal 380ms ease forwards; }
+@keyframes brand-wipe-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-wipe, .brand-wipe.is-reveal, .brand-wipe__word { animation-duration: 1ms !important; }
+}
