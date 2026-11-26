@@ -1,236 +1,149 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useRevealAll } from '../hooks/useReveal'
+import { Link } from 'react-router-dom'
 import { useBrand } from '../brand/BrandContext'
-import { supabase } from '../lib/supabaseClient'
-import { money } from '../admin/invoiceMath'
+import { brandPaths } from '../brand/brandPaths'
+import { fetchMenu, menuSections, priceLabel } from '../lib/menu'
 import './MenuPage.css'
 
-/* Light, brand-neutral one-liners per category. Categories not listed here
-   simply render without a subtitle — nothing breaks if Carolyn adds a new
-   category from the admin that isn't in this map yet. */
-const CATEGORY_SUBTITLE = {
-  'Celebration Cakes': 'Made to order for the moments worth celebrating.',
-  'Cupcakes & Mini Cakes': 'Individual-sized versions of your favourite flavours.',
-  'Cookies & Bars': 'Baked in small batches, always.',
-  'Filipino-Inspired Sweets': 'Classic flavours from home, made with care.',
-  'Pastries & Breakfast Bakes': 'For slow mornings and quick ones alike.',
-  'Savoury Breads & Bakes': 'When you want something other than sweet.',
-  'Cheesecakes, Tarts & Pies': 'Rich, creamy, and worth the fork fight.',
-  'Treat Boxes & Party Platters': 'Assorted favourites, ready to share.',
+const INTRO = {
+  limt: {
+    title: 'The menu',
+    body: "Everything here is baked by hand, in small batches, when you order it. Prices are a starting point. Don't see your favourite? Ask us. We love a challenge.",
+  },
+  tsismis: {
+    title: 'The goods',
+    body: "Filipino favourites first, everything else right behind. Baked fresh when you order, so tell us what you're craving. We won't tell anyone. (We'll tell everyone.)",
+  },
 }
 
-const slugify = (s) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-
-function buildTags(item) {
+function tagsFor(item, brandKey) {
   const tags = []
-  if (item.featured) tags.push({ label: 'Featured', type: 'brand' })
-  if (item.seasonal) tags.push({ label: 'Seasonal', type: 'seasonal' })
-  for (const tag of item.dietary_tags || []) tags.push({ label: tag, type: 'note' })
-  for (const tag of item.allergens || []) tags.push({ label: tag, type: 'note' })
+  // In Tsismis the Filipino items lead each section, so name them.
+  if (brandKey === 'tsismis' && item.is_filipino) tags.push({ label: 'Filipino favourite', kind: 'accent' })
+  if (item.seasonal) tags.push({ label: 'Seasonal', kind: 'accent' })
+  for (const t of item.dietary_tags || []) tags.push({ label: t, kind: 'plain' })
   return tags
 }
 
-function buildMenuForBrand(products, brand) {
-  const items = products.filter((p) => p.brand_id === brand || p.shown_both_brands)
-  const byCategory = new Map()
-  for (const item of items) {
-    const cat = item.category || 'More'
-    if (!byCategory.has(cat)) byCategory.set(cat, [])
-    byCategory.get(cat).push(item)
-  }
-  return [...byCategory.entries()].map(([category, catItems]) => ({
-    id: `${brand}-${slugify(category)}`,
-    label: category,
-    heading: category,
-    subtitle: CATEGORY_SUBTITLE[category] || null,
-    items: catItems,
-  }))
-}
-
-/* ── Sub-components ──────────────────────────────────────── */
-function Tag({ label, type, brand }) {
-  return <span className={`menu-tag menu-tag--${type} menu-tag--${brand}`}>{label}</span>
-}
-
-function MenuItem({ item, brand }) {
-  const tags = buildTags(item)
+function MenuItem({ item, brandKey }) {
+  const tags = tagsFor(item, brandKey)
   const hasPrice = item.base_price !== null && item.base_price !== undefined
   return (
-    <div className={`menu-item menu-item--${brand}`}>
-      <span className="menu-item__name">{item.name}</span>
-      <span className={`menu-item__price ${hasPrice ? '' : 'menu-item__price--muted'}`}>
-        {hasPrice ? `${item.price_type ? item.price_type + ' ' : ''}${money(item.base_price)}` : 'Ask for pricing'}
-      </span>
-      {item.description && <p className="menu-item__desc">{item.description}</p>}
-      {tags.length > 0 && (
-        <div className="menu-item__tags">
-          {tags.map((t, i) => <Tag key={`${item.id}-${t.label}-${i}`} {...t} brand={brand} />)}
+    <li className={`menu-item ${item.image_url ? 'has-photo' : ''}`}>
+      <div className="menu-item__text">
+        <div className="menu-item__head">
+          <h3 className="menu-item__name">{item.name}</h3>
+          <span className="menu-item__leader" aria-hidden="true" />
+          <span className={`menu-item__price ${hasPrice ? '' : 'is-muted'}`}>{priceLabel(item)}</span>
         </div>
-      )}
-    </div>
+        {item.description && <p className="menu-item__desc">{item.description}</p>}
+        {(tags.length > 0 || (item.allergens || []).length > 0) && (
+          <p className="menu-item__tags">
+            {tags.map((t) => (
+              <span key={t.label} className={`menu-tag menu-tag--${t.kind}`}>{t.label}</span>
+            ))}
+            {(item.allergens || []).length > 0 && (
+              <span className="menu-item__allergens">Contains: {item.allergens.join(', ')}</span>
+            )}
+          </p>
+        )}
+      </div>
+      {item.image_url && <img src={item.image_url} alt="" loading="lazy" className="menu-item__photo" width="96" height="96" />}
+    </li>
   )
 }
 
-function OrderCTA({ brand }) {
-  const isLimt = brand === 'limt'
-  return (
-    <div className="menu-cta">
-      <p className="menu-cta__eyebrow">{isLimt ? 'Place a Custom Order' : 'Catering & Events'}</p>
-      <h3 className="menu-cta__heading">{isLimt ? 'Something special in mind?' : 'Feeding a crowd?'}</h3>
-      <p className="menu-cta__body">
-        {isLimt
-          ? 'Celebrate with a custom cake, gift box, or event order. We would love to make something just for you.'
-          : "Custom meryenda spreads, pasalubong stations, and event catering. Tell us what you're planning and we'll make it happen."}
-      </p>
-      <a href="/order" className={`btn ${isLimt ? 'btn--blush' : 'btn--ube'}`}>
-        {isLimt ? 'Request a Quote' : 'Get in Touch'}
-      </a>
-    </div>
-  )
-}
-
-/* ══════════════════════════════════════════════════════════
-   MenuPage — reads live from Supabase `products`
-   ══════════════════════════════════════════════════════════ */
 export default function MenuPage() {
-  const brandFromUrl = useBrand()
-  const [products, setProducts] = useState([])
+  const brand = useBrand()
+  const paths = brandPaths(brand.key)
+  const intro = INTRO[brand.key] ?? INTRO.limt
+  const [menu, setMenu] = useState({ products: [], categories: [] })
   const [loading, setLoading] = useState(true)
-  // Starts on whichever brand the URL implies (BrandContext reads the path —
-  // "/menu" resolves to limt, "/tsismis/menu" resolves to tsismis). Purely an
-  // initial value: once loaded, the brand-pill toggle still works exactly as
-  // before and doesn't get overridden if the URL itself doesn't change.
-  const [activeBrand, setActiveBrand] = useState(brandFromUrl.key)
-  const [activeTab, setActiveTab] = useState(null)
-  const pageRef = useRevealAll()
+  const [activeId, setActiveId] = useState(null)
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_visible', true)
-        .order('sort_order')
-      if (!error && data) setProducts(data)
-      setLoading(false)
-    }
-    load()
+    let cancelled = false
+    fetchMenu()
+      .then((data) => !cancelled && setMenu(data))
+      .catch(() => {})
+      .finally(() => !cancelled && setLoading(false))
+    return () => { cancelled = true }
   }, [])
 
-  const menu = useMemo(() => ({
-    limt: buildMenuForBrand(products, 'limt'),
-    tsismis: buildMenuForBrand(products, 'tsismis'),
-  }), [products])
+  const sections = useMemo(
+    () => menuSections(menu.products, menu.categories, brand.key),
+    [menu, brand.key]
+  )
 
-  // Once data loads, default the active tab to the first section of the active brand.
+  // Highlight the section in view in the jump bar.
   useEffect(() => {
-    if (!activeTab && menu[activeBrand]?.length > 0) {
-      setActiveTab(menu[activeBrand][0].id)
-    }
-  }, [menu, activeBrand, activeTab])
-
-  const switchBrand = (brand) => {
-    setActiveBrand(brand)
-    const firstSection = menu[brand][0]?.id
-    if (firstSection) {
-      setActiveTab(firstSection)
-      document.getElementById(firstSection)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
-
-  const scrollToSection = (id, brand) => {
-    if (brand !== activeBrand) setActiveBrand(brand)
-    setActiveTab(id)
-    setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 50)
-  }
-
-  const currentSections = menu[activeBrand]
+    if (sections.length === 0) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting)
+        if (visible.length) setActiveId(visible[0].target.id)
+      },
+      { rootMargin: '-140px 0px -60% 0px' }
+    )
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [sections])
 
   return (
-    <div ref={pageRef}>
-
-      {/* ── Brand header ──────────────────────────────────── */}
-      <header className="menu-header">
-        <p className="menu-header__eyebrow">Handcrafted in Toronto · Order for pickup or delivery</p>
-        <div className="menu-header__lockup">
-          <button
-            className={`brand-pill brand-pill--limt ${activeBrand === 'limt' ? 'active' : ''}`}
-            onClick={() => switchBrand('limt')}
-          >
-            <span className="brand-pill__name">Love in My Tummy</span>
-          </button>
-          <div className="brand-divider" aria-hidden="true" />
-          <button
-            className={`brand-pill brand-pill--tsismis ${activeBrand === 'tsismis' ? 'active' : ''}`}
-            onClick={() => switchBrand('tsismis')}
-          >
-            <span className="brand-pill__name">Tsismis</span>
-          </button>
-        </div>
+    <div className="menu-page">
+      <header className="wrap menu-intro">
+        <h1 className="display menu-intro__title">{intro.title}</h1>
+        <p className="lede">{intro.body}</p>
       </header>
 
-      {/* ── Sticky section nav ────────────────────────────── */}
-      {!loading && (
-        <nav className="menu-nav" aria-label="Menu sections">
-          <div className="menu-nav__inner">
-            {Object.entries(menu).flatMap(([brand, sections]) =>
-              sections.map((s) => (
-                <button
-                  key={s.id}
-                  className={`menu-nav__tab ${activeTab === s.id ? 'active' : ''} menu-nav__tab--${brand} ${activeBrand !== brand ? 'dimmed' : ''}`}
-                  onClick={() => scrollToSection(s.id, brand)}
-                  data-brand={brand}
-                >
-                  {s.label}
-                </button>
-              ))
-            )}
-          </div>
+      {!loading && sections.length > 0 && (
+        <nav className="menu-jump" aria-label="Menu sections">
+          <ul className="menu-jump__list">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`} className={activeId === s.id ? 'is-active' : ''} aria-current={activeId === s.id ? 'true' : undefined}>
+                  {s.heading}
+                </a>
+              </li>
+            ))}
+          </ul>
         </nav>
       )}
 
-      {/* ── Menu content ──────────────────────────────────── */}
-      <main className="menu-main">
+      <div className="wrap menu-body">
         {loading ? (
-          <p className="menu-loading">Loading the menu…</p>
-        ) : currentSections.length === 0 ? (
-          <p className="menu-loading">Nothing published here yet — check back soon.</p>
+          <p className="menu-status">Loading the menu…</p>
+        ) : sections.length === 0 ? (
+          <p className="menu-status">Nothing is on the menu yet. Check back soon.</p>
         ) : (
-          currentSections.map((section, idx) => (
-            <section key={section.id} id={section.id} className="menu-section">
-
-              <div className={`whisper whisper--${activeBrand}`}>
-                <div className="whisper__line" />
-                <span className="whisper__label">
-                  {activeBrand === 'limt' ? 'Love in My Tummy' : 'Tsismis'}
-                </span>
-                <div className="whisper__line" />
+          sections.map((section) => (
+            <section key={section.id} id={section.id} className="menu-section" aria-labelledby={`${section.id}-title`}>
+              <div className="menu-section__head">
+                <h2 id={`${section.id}-title`} className="heading menu-section__title">{section.heading}</h2>
+                {section.subtitle && <p className="menu-section__subtitle">{section.subtitle}</p>}
               </div>
-
-              <h2 className="menu-section__heading">{section.heading}</h2>
-              {section.subtitle && <p className="menu-section__subtitle">{section.subtitle}</p>}
-
-              {section.items.map((item) => (
-                <MenuItem key={item.id} item={item} brand={activeBrand} />
-              ))}
-
-              {idx === currentSections.length - 1 && <OrderCTA brand={activeBrand} />}
+              <ul className="menu-section__items">
+                {section.items.map((item) => <MenuItem key={item.id} item={item} brandKey={brand.key} />)}
+              </ul>
             </section>
           ))
         )}
 
-        <div className="menu-allergen">
-          <strong>Allergen Information</strong>
-          Tags shown on each item reflect the ingredients on file for that recipe. All items are prepared in one
-          kitchen that regularly handles wheat, dairy, eggs, and tree nuts, so trace cross-contact is possible even
-          where it isn't listed on a specific item. Please reach out before ordering if you have a severe allergy.
-        </div>
-      </main>
+        <aside className="menu-cta">
+          <h2 className="subheading">Dreaming of something that isn’t here?</h2>
+          <p>Custom flavours, party platters, gift boxes, your grandmother’s favourite reimagined. Tell us what you’re planning and we’ll make it happen.</p>
+          <Link to={paths.order} className="button">Place an order</Link>
+        </aside>
 
+        <p className="menu-allergen">
+          <strong>About allergens.</strong> Tags on each item list the allergens in that recipe. Everything is made in one
+          kitchen that handles wheat, dairy, eggs and tree nuts, so traces are possible even when they aren’t listed.
+          If you have a severe allergy, please get in touch before ordering.
+        </p>
+      </div>
     </div>
   )
 }
